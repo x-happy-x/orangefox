@@ -6,6 +6,11 @@
   <!-- This experimental upstream project returns HTTP 401. Neither pinned
        Recovery nor vendor/recovery references libarchive or its BSD tools. -->
   <remove-project name="external/libarchive" />
+  <!-- The pinned recovery/vendor configs do not select the NAS experiment.
+       rclone depends on the unavailable fox-go project, even at graph time. -->
+  <remove-project name="external/libfuse3" />
+  <remove-project name="external/rclone" />
+  <remove-project name="external/fox-go" />
   <extend-project name="bionic" path="bionic" revision="33fcbd9974be3b3b2899a484f8c0cb8dfa2d5e82" upstream="refs/heads/fox_16.0" />
   <extend-project name="bootable/Recovery" path="bootable/recovery" revision="0f7831d3240f4c3925a0b5fd7d2c907ddf8704c2" upstream="refs/heads/fox_16.0" />
   <extend-project name="build/make" path="build/make" revision="1bffc0092f671d6fc2bd3604c56ccc30856ce4a6" upstream="refs/heads/fox_16.0" />
@@ -41,7 +46,14 @@
   <extend-project name="system/security" path="system/security" revision="d614e274b585a67e80d3d3fbc3a6e9f695998f78" upstream="refs/heads/fox_16.0" />
   <extend-project name="system/sepolicy" path="system/sepolicy" revision="9641d92817ae79b2d4cd02dfe5c24de7de2014b4" upstream="refs/heads/fox_16.0" />
   <extend-project name="system/update_engine" path="system/update_engine" revision="c78c40f7a85e5ab7928faf1133cb5eadfc2d1673" upstream="refs/heads/fox_16.0" />
-  <extend-project name="system/vold" path="system/vold" revision="953de9608eb78380b3c4e39e801c2bc0af7dbddc" upstream="refs/heads/fox_16.0" />
+  <!-- 18 recovery data-safety fixes on top of OrangeFox's vold snapshot. -->
+  <remove-project name="system/vold" />
+  <project name="TWRP-Test/android_system_vold" path="system/vold" remote="github" revision="4c83041ec61f9b482085685f1e6aed5a62f103aa" upstream="refs/heads/twrp-16.0" clone-depth="1" />
+  <!-- Each fork differs from AOSP r1 by one recovery_available declaration. -->
+  <remove-project name="platform/system/keymaster" />
+  <project name="TWRP-Test/android_system_keymaster" path="system/keymaster" remote="github" revision="9e111ed820350961202c637b4135ff83aa06a70b" upstream="refs/heads/twrp-16.0" clone-depth="1" />
+  <remove-project name="platform/system/hardware/interfaces" />
+  <project name="TWRP-Test/android_system_hardware_interfaces" path="system/hardware/interfaces" remote="github" revision="ee6d7c54ce09cffb9808afc86fcd4828be2f077a" upstream="refs/heads/twrp-16.0" clone-depth="1" />
   <extend-project name="vendor/recovery" path="vendor/recovery" revision="ebef8ef3a7066551d93d85652920d11a68e01adc" upstream="refs/heads/main" />
   <extend-project name="vendor/twrp" path="vendor/twrp" revision="3e0b71f4d1f624f7ea462507a1b974d80cc65627" upstream="refs/heads/fox_16.0" />
   <remote name="android-dev-device" fetch="https://github.com" />

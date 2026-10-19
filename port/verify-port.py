@@ -64,12 +64,15 @@ def main():
     if not args.device_only:
         require(git(root / ".repo/manifests", "rev-parse", "HEAD").decode().strip() == MANIFEST_REV,
                 "Manifest snapshot mismatch")
+        edited_projects = {edit["project"] for edit in
+                           json.loads((PORT / "source-edits.json").read_text(encoding="utf-8"))}
         for item in json.loads((PORT / "locked-projects.json").read_text(encoding="utf-8")):
             path = root / item["path"]
             require(git(path, "rev-parse", "HEAD").decode().strip() == item["sha"],
                     f"Source revision mismatch: {item['path']}")
-            require(not git(path, "status", "--porcelain").strip(),
+            require(item["path"] in edited_projects or not git(path, "status", "--porcelain").strip(),
                     f"Source has local changes: {item['path']}")
+        subprocess.run([sys.executable, str(PORT / "source-edits.py"), str(root)], check=True)
     print("Port verified: pinned sources; popsicle-only product; upstream kernel, crypto, fstab and AVB configuration preserved.")
 
 

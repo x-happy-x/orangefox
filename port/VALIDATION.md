@@ -13,25 +13,30 @@ Snapshot checked on 2026-10-19:
 - [OrangeFox Recovery fox_16.0](https://gitlab.com/OrangeFox/bootable/Recovery/-/commit/0f7831d3240f4c3925a0b5fd7d2c907ddf8704c2)
 - [OrangeFox vendor/recovery main](https://gitlab.com/OrangeFox/vendor/recovery/-/commit/ebef8ef3a7066551d93d85652920d11a68e01adc)
 - [YuKongA SM8850 TWRP Android 16 tree](https://github.com/YuKongA/twrp_device_xiaomi_sm8850/tree/8023035649595341e26f9b924928c0b0cd67fbd2)
+- [TWRP-Test vold recovery safety snapshot](https://github.com/TWRP-Test/android_system_vold/commit/4c83041ec61f9b482085685f1e6aed5a62f103aa)
+- [TWRP-Test keymaster recovery variant](https://github.com/TWRP-Test/android_system_keymaster/commit/9e111ed820350961202c637b4135ff83aa06a70b)
+- [TWRP-Test keystore2 AIDL recovery variant](https://github.com/TWRP-Test/android_system_hardware_interfaces/commit/ee6d7c54ce09cffb9808afc86fcd4828be2f077a)
 
 The upstream README calls popsicle its primary test device and claims working
 decryption, display, ADB, MTP, fastbootd, flashing, sideload, USB OTG and vibration.
 Those are upstream claims, not test results for this OrangeFox build.
 
-`local-manifest.xml` pins all upstream branch references to exact commit IDs,
-keeps the existing fixed SHA dependencies, and uses the manifest's AOSP
+`local-manifest.xml` pins all required upstream branch references to exact commit
+IDs, retains available fixed-SHA dependencies, and uses the manifest's AOSP
 `android-16.0.0_r1` tag. It removes the unrelated mondrian and sm84xx sample
-device trees and the unused unavailable project described below.
+device trees and the unused experimental NAS bundle described below.
 `repo manifest -r` records the resolved complete source manifest
 after sync and with every build, including every AOSP repository commit.
 
-The upstream manifest also contains `external/libarchive` at
-`9f1aa0d393d0bc7e74daae0eae647601623de58e`, but its OrangeFox GitLab URL returns
-HTTP 401 without authorization. The local manifest removes this unused project
-rather than substituting different code. Searches across the pinned Recovery
-and vendor sources found no build dependency on libarchive, BSD archive tools
-or its archive read/write APIs. The completed build must still prove there is
-no missing module caused by this removal.
+The upstream manifest also contains an experimental NAS bundle:
+`external/libarchive`, `external/libfuse3`, `external/rclone`, and
+`prebuilts/fox-go` (the latter from `external/fox-go`). The OrangeFox GitLab URLs
+for libarchive, libfuse3 and fox-go return HTTP 401 without authorization;
+rclone is public but its Soong file imports the unavailable fox-go build module.
+The local manifest removes this entire unused bundle. Searches across the exact
+pinned Recovery, vendor/recovery and vendor/twrp build configuration found no
+selected module dependency on these projects. The completed build must still
+prove there is no missing module caused by this removal.
 
 The patch changes only the Android.mk product selector and AndroidProducts.mk
 entry. The overlay adds `twrp_popsicle.mk` with the narrow device assertion and
@@ -40,6 +45,48 @@ file remains present. No guessed display resolution, notch size, touch offset,
 fstab, cryptographic policy or vendor service is introduced. The upstream
 hardware-SKU script still selects the popsicle display/touch/weaver/haptics
 properties and firmware at runtime.
+
+## Crypto source comparison and fixes
+
+The device author's recommended TWRP-Test manifest and OrangeFox both use the
+AOSP Android 16 r1 base, but their vold recovery code was not equivalent.
+OrangeFox pinned vold `953de9608eb78380b3c4e39e801c2bc0af7dbddc` is an ancestor
+of TWRP-Test `4c83041ec61f9b482085685f1e6aed5a62f103aa`: the latter adds exactly
+18 recovery safety commits, changing 12 files. This port selects that complete
+TWRP-Test vold snapshot rather than dropping those changes. The changes:
+
+- Preserve existing FBE device/user keys when a key or metadata mount is missing;
+  avoid deleting Keystore keys or sibling CE key bindings as a recovery fallback.
+- Keep KeyMint upgrades temporary and leave installed key blobs untouched; warn
+  about synthetic-password key upgrades and keystore2 garbage collection if
+  `sys.boot_completed` has been set in recovery.
+- Synchronize the installed keystore database into tmpfs while keystore2 is
+  stopped, using SQLite backup to include WAL content, then restart the service.
+- Support an AIDL-only Gatekeeper in the legacy credential path, bound service
+  waits, correctly pad synthetic-password handles, and fix SELinux handle setup
+  and restorecon when libvold runs inside recovery.
+
+`Android.bp`, Weaver implementation and the FBE/KeyUtil/Keystore public APIs
+remain the same except for `copySqliteDb()` becoming `syncKeystoreDb()`.
+`source-edits.json` updates the one OrangeFox `twrp.cpp` caller exactly as in
+TWRP-Test, and adds its six `recovery_available` declarations for Gatekeeper,
+secure element, KeyMint AIDL/support, secure clock and Weaver. The separate
+keymaster and system/hardware/interfaces snapshots each differ from AOSP r1 by
+one additional recovery variant declaration. These changes let the existing
+recovery dependency graph actually link the required Android 16 HAL libraries.
+
+The system/security commit is already identical in both manifests
+(`d614e274b585a67e80d3d3fbc3a6e9f695998f78`). The OMAPI service implementation is
+also identical; the newer TWRP OMAPI repository only adds Soong init/VINTF
+installation. OrangeFox already installs the same init/VINTF files from its
+recovery tree, so that duplicate installation is not imported. Other AOSP
+gatekeeper/keymint projects remain on the same r1 base.
+
+The source edits are checked against the original pinned Git blobs before
+anything is changed, then verified for exact content and allowed paths. The
+review above establishes source/API alignment, not successful decryption on a
+particular installed HyperOS version. The vendor/odm services, firmware, hardware
+SKU selection and synthetic version/SPL behaviour still require device tests.
 
 The board still builds a dedicated, slot-selected recovery image, with header
 v4, LZ4 ramdisk, the original prebuilt kernel, 100 MiB recovery partition,
@@ -76,6 +123,8 @@ firmware, partition table, bootloader state and a known-good TWRP image.
 - Exact allowed device changes; no unrelated edits or replacement kernel.
 - Original kernel size and board AVB/FBE/OMAPI/partition/header invariants.
 - Exact narrow product and overlay configuration.
+- Exact recovery keystore API edit and six HAL recovery variant declarations;
+  pinned TWRP-Test vold and its two recovery dependency snapshots.
 - `mka recoveryimage` exit status, image presence, 100 MiB partition size limit.
 - AVB metadata parsing, embedded signature/hash verification with the source
   tree's avbtool, and SHA-256 output for images and installer ZIPs.

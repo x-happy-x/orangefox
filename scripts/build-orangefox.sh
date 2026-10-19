@@ -54,6 +54,11 @@ repo manifest -r -o "$artifact/manifest.xml"
 git -C "$source_dir/$DEVICE_PATH" diff --binary > "$artifact/device-tree.patch"
 cp "$source_dir/$DEVICE_PATH/twrp_popsicle.mk" "$source_dir/$DEVICE_PATH/vendorsetup.sh" "$artifact/"
 cp "$toolkit/port/sources.env" "$artifact/"
+cp "$toolkit/port/source-edits.json" "$artifact/"
+cp "$toolkit/port/local-manifest.xml" "$artifact/"
+for project in bootable/recovery hardware/interfaces; do
+    git -C "$source_dir/$project" diff --binary > "$artifact/${project//\//-}.patch"
+done
 cp "$toolkit/port/VALIDATION.md" "$artifact/"
 dpkg-query -W -f='${binary:Package}\t${Version}\n' > "$artifact/installed-packages.tsv"
 uname -a > "$artifact/build-host.txt"

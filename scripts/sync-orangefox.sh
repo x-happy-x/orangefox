@@ -44,6 +44,7 @@ if [[ -e $manifest ]]; then
 else
     install -m 0644 "$toolkit/port/local-manifest.xml" "$manifest"
 fi
+python3 "$toolkit/scripts/repair-shallow-resume.py" "$source_dir"
 repo sync -c --no-tags --no-clone-bundle --fail-fast -j"$jobs"
 bash "$toolkit/port/apply-port.sh" "$source_dir"
 python3 "$toolkit/port/verify-port.py" "$source_dir"

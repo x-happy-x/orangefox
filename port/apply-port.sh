@@ -26,3 +26,4 @@ for name in twrp_popsicle.mk vendorsetup.sh; do
 done
 chmod 0755 "$tree/vendorsetup.sh"
 python3 "$port_dir/verify-port.py" "$source_dir" --device-only
+python3 "$port_dir/source-edits.py" --apply "$source_dir"

@@ -245,11 +245,25 @@
     "sha": "c78c40f7a85e5ab7928faf1133cb5eadfc2d1673"
   },
   {
-    "name": "system/vold",
+    "name": "TWRP-Test/android_system_vold",
     "path": "system/vold",
-    "url": "https://gitlab.com/OrangeFox/system/vold.git",
-    "branch": "fox_16.0",
-    "sha": "953de9608eb78380b3c4e39e801c2bc0af7dbddc"
+    "url": "https://github.com/TWRP-Test/android_system_vold.git",
+    "branch": "twrp-16.0",
+    "sha": "4c83041ec61f9b482085685f1e6aed5a62f103aa"
+  },
+  {
+    "name": "TWRP-Test/android_system_keymaster",
+    "path": "system/keymaster",
+    "url": "https://github.com/TWRP-Test/android_system_keymaster.git",
+    "branch": "twrp-16.0",
+    "sha": "9e111ed820350961202c637b4135ff83aa06a70b"
+  },
+  {
+    "name": "TWRP-Test/android_system_hardware_interfaces",
+    "path": "system/hardware/interfaces",
+    "url": "https://github.com/TWRP-Test/android_system_hardware_interfaces.git",
+    "branch": "twrp-16.0",
+    "sha": "ee6d7c54ce09cffb9808afc86fcd4828be2f077a"
   },
   {
     "name": "vendor/recovery",
