@@ -67,6 +67,7 @@ for project in bootable/recovery hardware/interfaces frameworks/base external/sc
     git -C "$source_dir/$project" diff --binary > "$artifact/${project//\//-}.patch"
 done
 cp "$toolkit/port/VALIDATION.md" "$artifact/"
+cp "$toolkit/port/reference-report.json" "$artifact/"
 dpkg-query -W -f='${binary:Package}\t${Version}\n' > "$artifact/installed-packages.tsv"
 uname -a > "$artifact/build-host.txt"
 [[ -f external/avb/avbtool.py ]] || die 'AVB source tool is missing.'

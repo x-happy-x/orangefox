@@ -21,6 +21,18 @@ The upstream README calls popsicle its primary test device and claims working
 decryption, display, ADB, MTP, fastbootd, flashing, sideload, USB OTG and vibration.
 Those are upstream claims, not test results for this OrangeFox build.
 
+The author's [12 September 2026 TWRP binary](https://github.com/YuKongA/twrp_device_xiaomi_sm8850/releases/tag/2026-09-12-34690428367)
+was also downloaded and inspected. Its release tag and successful GitHub Actions
+run point to the exact pinned device commit. The 100 MiB asset matches GitHub's
+SHA-256 `e65c58d1bc27a78b8618a03b95c53bcc81a61dd213cad3f4c8639a68806476d4`.
+It confirms header v4, no kernel payload, an LZ4 legacy ramdisk and AVB algorithm
+`NONE`; avbtool verified its hash descriptor. All 27 selected device fstab/init,
+variant and ueventd files match both pinned Git blobs and our device checkout
+byte-for-byte. `reference-report.json` records the comparison. The original
+image and reports are retained in `/home/android/reference/android-dev/` in the
+prepared WSL image. This comparison establishes source identity and structure;
+it does not establish compatibility with the user's installed firmware.
+
 `local-manifest.xml` pins all required upstream branch references to exact commit
 IDs, retains available fixed-SHA dependencies, and uses the manifest's AOSP
 `android-16.0.0_r1` tag. It removes the unrelated mondrian and sm84xx sample
