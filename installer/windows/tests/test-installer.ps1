@@ -285,6 +285,7 @@ foreach ($enabled in @($false, $true)) {
         $partitionBytes = [long]104857600
         $rollbackHash = 'offline-fixture'
         $files = @()
+        $layout = 'full'
         & $MetadataOnly
     } $metadataOnly $enabled
     $device = $result['device']

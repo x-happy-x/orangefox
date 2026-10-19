@@ -4,9 +4,11 @@ $ErrorActionPreference = 'Stop'
 $script:PartitionBytes = [long]104857600
 $script:RollbackSha256 = 'e65c58d1bc27a78b8618a03b95c53bcc81a61dd213cad3f4c8639a68806476d4'
 
-function Get-RequiredPackageFiles {
+function Get-RequiredPackageFiles([string]$Layout = 'full') {
+    if ($Layout -cnotin @('full', 'minimal')) { throw 'Unsupported package layout.' }
+    $image = if ($Layout -ceq 'minimal') { 'recovery.img' } else { 'Images/OrangeFox-popsicle.img' }
     @('flash.cmd', 'restore-twrp.cmd', 'install-recovery.ps1', 'recovery-installer.psm1', 'README.txt', 'DEVICE-TEST.md',
-      'Images/OrangeFox-popsicle.img', 'Images/TWRP-popsicle.img',
+      $image, 'Images/TWRP-popsicle.img',
       'platform-tools/adb.exe', 'platform-tools/fastboot.exe',
       'platform-tools/AdbWinApi.dll', 'platform-tools/AdbWinUsbApi.dll',
       'platform-tools/libwinpthread-1.dll', 'platform-tools/NOTICE.txt',
@@ -18,7 +20,7 @@ function Get-FileSha256([string]$Path) {
 }
 
 function Assert-RecoveryImage([string]$Path) {
-    $item = Get-Item -LiteralPath $Path
+    $item = Get-Item -LiteralPath $Path -Force
     if ($item.PSIsContainer -or $item.Length -ne $script:PartitionBytes) {
         throw "Recovery image must be exactly 100 MiB: $Path"
     }
@@ -34,14 +36,18 @@ function Assert-RecoveryImage([string]$Path) {
 }
 
 function Assert-PackageIntegrity([string]$PackageRoot) {
-    $root = (Get-Item -LiteralPath $PackageRoot).FullName
+    $root = (Get-Item -LiteralPath $PackageRoot -Force).FullName
     $metadata = Get-Content -LiteralPath (Join-Path $root 'metadata.json') -Raw | ConvertFrom-Json
     if ($metadata.schema_version -ne 1 -or $metadata.device.product -cne 'popsicle' -or
         [long]$metadata.partition_size_bytes -ne $script:PartitionBytes -or
         $metadata.platform_tools_version -cne '36.0.2') {
         throw 'Unsupported package metadata, device, platform-tools version or partition size.'
     }
-    $expected = @(Get-RequiredPackageFiles)
+    # Old packages omit layout and retain the original fixed image path.
+    $layoutProperty = $metadata.PSObject.Properties['layout']
+    $layout = if ($null -eq $layoutProperty) { 'full' } else { $layoutProperty.Value }
+    if ($layout -isnot [string] -or $layout -cnotin @('full', 'minimal')) { throw 'Unsupported package layout.' }
+    $expected = @(Get-RequiredPackageFiles $layout)
     $seen = @{}
     foreach ($entry in @($metadata.files)) {
         $name = [string]$entry.path
@@ -51,14 +57,14 @@ function Assert-PackageIntegrity([string]$PackageRoot) {
         }
         $seen[$name] = $true
         $path = Join-Path $root ($name.Replace('/', [IO.Path]::DirectorySeparatorChar))
-        $file = Get-Item -LiteralPath $path
+        $file = Get-Item -LiteralPath $path -Force
         if ($file.PSIsContainer -or ($file.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
             $file.Length -ne [long]$entry.bytes -or (Get-FileSha256 $path) -cne [string]$entry.sha256) {
             throw "SHA256/size validation failed: $name"
         }
     }
     if ($seen.Count -ne $expected.Count) { throw 'The package file list is incomplete.' }
-    $orangefox = Join-Path $root 'Images/OrangeFox-popsicle.img'
+    $orangefox = Join-Path $root $(if ($layout -ceq 'minimal') { 'recovery.img' } else { 'Images/OrangeFox-popsicle.img' })
     $rollback = Join-Path $root 'Images/TWRP-popsicle.img'
     Assert-RecoveryImage $orangefox
     Assert-RecoveryImage $rollback
@@ -217,7 +223,7 @@ function Save-RecoveryBackup {
         $stream.Dispose()
         $stream = $null
         if ($process.ExitCode -ne 0) { throw ('ADB recovery backup failed: ' + $stderr.GetAwaiter().GetResult()) }
-        if ((Get-Item -LiteralPath $destination).Length -ne $script:PartitionBytes) { throw 'The recovery backup is incomplete.' }
+        if ((Get-Item -LiteralPath $destination -Force).Length -ne $script:PartitionBytes) { throw 'The recovery backup is incomplete.' }
         $localHash = Get-FileSha256 $destination
         $deviceHashAfter = Get-AdbPartitionSha256 $PackageRoot $Serial $devicePath
         if ($deviceHashBefore -cne $localHash -or $deviceHashAfter -cne $localHash) {
