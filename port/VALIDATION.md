@@ -1,9 +1,13 @@
 # Xiaomi 17 Pro Max (popsicle): experimental OrangeFox port
 
-This is an unofficial Android 16 port, not an OrangeFox release approved for
-flashing. A successful build proves that sources compile and that an image was
-produced. It does not prove that the image boots or decrypts this particular
-phone/HyperOS build. No flashing command is supplied or run by this toolkit.
+This document records the ANDROID-1 baseline build on 2026-10-19. Subsequent
+on-device boot/decryption checks are recorded in [ANDROID-2](../docs/ANDROID-2-device-test.md)
+and the current [ANDROID-3 report](../docs/ANDROID-3-device-test.md).
+ANDROID-3 adds UI/editor changes, guarded root choices, modules navigation,
+a separate Secure Element readiness helper and a Windows recovery installer.
+The initial baseline below did not supply or run a flashing command.
+This remains an unofficial experimental Android 16 port. Compilation alone
+does not prove device boot or decryption; use the hardware reports for those checks.
 
 ## Source and adaptation
 
@@ -50,7 +54,7 @@ pinned Recovery, vendor/recovery and vendor/twrp build configuration found no
 selected module dependency on these projects. The completed build must still
 prove there is no missing module caused by this removal.
 
-The patch changes only the Android.mk product selector and AndroidProducts.mk
+The initial product patch changes only the Android.mk product selector and AndroidProducts.mk
 entry. The overlay adds `twrp_popsicle.mk` with the narrow device assertion and
 `vendorsetup.sh` with the OrangeFox options. The unused upstream unified product
 file remains present. No guessed display resolution, notch size, touch offset,
@@ -105,10 +109,12 @@ particular installed HyperOS version. The vendor/odm services, firmware, hardwar
 SKU selection and synthetic version/SPL behaviour still require device tests.
 
 The board still builds a dedicated, slot-selected recovery image, with header
-v4, LZ4 ramdisk, the original prebuilt kernel, 100 MiB recovery partition,
+v4, LZ4 ramdisk without a kernel payload, 100 MiB recovery partition,
 virtual A/B and dynamic partitions. The selected OrangeFox mode is vanilla
 virtual A/B with a recovery partition. Stock boot/OTA patching and the bundled
-Magisk addon are disabled; no vbmeta-patching flag is enabled.
+Magisk addon were disabled in this baseline; no vbmeta-patching flag is enabled.
+The stock kernel remains in boot. ANDROID-3 replaces root addons with the guarded
+explicit choices described in its report.
 
 ## AVB and encryption constraints
 
@@ -117,7 +123,8 @@ kernel and vendor/odm blobs are kept byte-for-byte. In particular,
 `BOARD_AVB_ENABLE=true`, FBE metadata decryption, OMAPI, fscrypt v2 and the
 wrapped-key fstab configuration are retained. The upstream synthetic platform
 version and 2099 security patch values also remain unchanged; compatibility
-with the installed firmware/bootloader has not been established.
+with the installed firmware/bootloader had not yet been established at this
+baseline stage; subsequent checks cover the firmware named in the hardware reports.
 
 AOSP build signing is not Xiaomi OEM signing. This upstream A/B tree does not
 declare a separate recovery signing key; the generated recovery AVB metadata
