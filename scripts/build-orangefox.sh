@@ -55,6 +55,8 @@ git -C "$source_dir/$DEVICE_PATH" diff --binary > "$artifact/device-tree.patch"
 cp "$source_dir/$DEVICE_PATH/twrp_popsicle.mk" "$source_dir/$DEVICE_PATH/vendorsetup.sh" "$artifact/"
 cp "$toolkit/port/sources.env" "$artifact/"
 cp "$toolkit/port/VALIDATION.md" "$artifact/"
+dpkg-query -W -f='${binary:Package}\t${Version}\n' > "$artifact/installed-packages.tsv"
+uname -a > "$artifact/build-host.txt"
 [[ -f external/avb/avbtool.py ]] || die 'AVB source tool is missing.'
 python3 external/avb/avbtool.py info_image --image "$artifact/recovery.img" > "$artifact/avb-info.txt"
 # This checks the embedded AVB signature when present and the image hash.
