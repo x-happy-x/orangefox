@@ -20,9 +20,18 @@ Those are upstream claims, not test results for this OrangeFox build.
 
 `local-manifest.xml` pins all upstream branch references to exact commit IDs,
 keeps the existing fixed SHA dependencies, and uses the manifest's AOSP
-`android-16.0.0_r1` tag. It removes only the unrelated mondrian and sm84xx sample
-device trees. `repo manifest -r` records the resolved complete source manifest
+`android-16.0.0_r1` tag. It removes the unrelated mondrian and sm84xx sample
+device trees and the unused unavailable project described below.
+`repo manifest -r` records the resolved complete source manifest
 after sync and with every build, including every AOSP repository commit.
+
+The upstream manifest also contains `external/libarchive` at
+`9f1aa0d393d0bc7e74daae0eae647601623de58e`, but its OrangeFox GitLab URL returns
+HTTP 401 without authorization. The local manifest removes this unused project
+rather than substituting different code. Searches across the pinned Recovery
+and vendor sources found no build dependency on libarchive, BSD archive tools
+or its archive read/write APIs. The completed build must still prove there is
+no missing module caused by this removal.
 
 The patch changes only the Android.mk product selector and AndroidProducts.mk
 entry. The overlay adds `twrp_popsicle.mk` with the narrow device assertion and
@@ -47,7 +56,12 @@ wrapped-key fstab configuration are retained. The upstream synthetic platform
 version and 2099 security patch values also remain unchanged; compatibility
 with the installed firmware/bootloader has not been established.
 
-AOSP build signing is not Xiaomi OEM signing. An AVB footer parsing successfully
+AOSP build signing is not Xiaomi OEM signing. This upstream A/B tree does not
+declare a separate recovery signing key; the generated recovery AVB metadata
+may therefore use algorithm `NONE`, with its hash descriptor intended for the
+vbmeta chain. Check the actual `avb-info.txt` output. The toolkit verifies the
+embedded signature if present and the recovery image hash, without claiming
+that a signature exists when its algorithm is `NONE`. Successful AVB verification
 does not mean a locked bootloader will accept the image or that rollback state,
 the active slot, stock vbmeta chain and vendor firmware match it. Keeping the
 upstream AVB settings is necessary for this port but is not a flashing recipe.
@@ -63,7 +77,10 @@ firmware, partition table, bootloader state and a known-good TWRP image.
 - Original kernel size and board AVB/FBE/OMAPI/partition/header invariants.
 - Exact narrow product and overlay configuration.
 - `mka recoveryimage` exit status, image presence, 100 MiB partition size limit.
-- AVB metadata parsing with the source tree's avbtool and image SHA-256 output.
+- AVB metadata parsing, embedded signature/hash verification with the source
+  tree's avbtool, and SHA-256 output for images and installer ZIPs.
+- Byte equality between recovery.img and any exported OrangeFox named image;
+  matching recovery.img inside its installer ZIP, plus ZIP CRC checks.
 - Complete resolved manifest, build log and port sources saved with the image.
 
 `ALLOW_MISSING_DEPENDENCIES := true` is already set by the upstream minimal TWRP
@@ -87,6 +104,7 @@ kernel logs for keymint, weaver, wrapped-key and AVB errors. Any unsupported
 hardware SKU, decryption failure, abnormal read/write mount or Android boot
 failure blocks treating the result as usable recovery.
 
-Keep the first generated ZIP local and experimental. The toolkit deliberately
-exports only `recovery.img`; OrangeFox may also create an installer ZIP in the
-build output, but that installer has not been validated on this phone.
+Keep the first generated ZIP local and experimental. The toolkit exports
+`recovery.img` and OrangeFox named images/installers that contain exactly the
+same recovery bytes. Neither that byte comparison nor a ZIP CRC check validates
+the installer's flashing logic on this phone.

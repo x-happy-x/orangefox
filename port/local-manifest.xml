@@ -3,6 +3,9 @@
 <manifest>
   <remove-project name="device/mondrian" />
   <remove-project name="device/sm84xx-common" />
+  <!-- This experimental upstream project returns HTTP 401. Neither pinned
+       Recovery nor vendor/recovery references libarchive or its BSD tools. -->
+  <remove-project name="external/libarchive" />
   <extend-project name="bionic" path="bionic" revision="33fcbd9974be3b3b2899a484f8c0cb8dfa2d5e82" upstream="refs/heads/fox_16.0" />
   <extend-project name="bootable/Recovery" path="bootable/recovery" revision="0f7831d3240f4c3925a0b5fd7d2c907ddf8704c2" upstream="refs/heads/fox_16.0" />
   <extend-project name="build/make" path="build/make" revision="1bffc0092f671d6fc2bd3604c56ccc30856ce4a6" upstream="refs/heads/fox_16.0" />
