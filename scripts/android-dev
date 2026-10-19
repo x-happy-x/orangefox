@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+toolkit=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+case "${1:-help}" in
+  doctor)
+    # shellcheck disable=SC1091
+    . /etc/os-release
+    printf 'Distro: %s\nUser: %s\nToolkit: %s\n' "$PRETTY_NAME" "$(id -un)" "$toolkit"
+    uname -r
+    for command in git git-lfs repo python3 java gcc g++ make ccache adb fastboot lz4 shellcheck; do
+      command -v "$command" || exit 1
+    done
+    df -h "$HOME"
+    free -h
+    ;;
+  sync) shift; exec bash "$toolkit/scripts/sync-orangefox.sh" "$@" ;;
+  build) shift; exec bash "$toolkit/scripts/build-orangefox.sh" "$@" ;;
+  *) printf '%s\n' 'Usage: android-dev {doctor|sync|build}' ;;
+esac
