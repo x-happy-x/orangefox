@@ -1,0 +1,56 @@
+[
+  {
+    "project": "bootable/recovery",
+    "file": "twrp.cpp",
+    "before": "android::keystore::copySqliteDb();",
+    "after": "android::keystore::syncKeystoreDb();"
+  },
+  {
+    "project": "frameworks/base",
+    "file": "omapi/aidl/Android.bp",
+    "before": "    name: \"android.se.omapi\",\n    vendor_available: true,\n",
+    "after": "    name: \"android.se.omapi\",\n    vendor_available: true,\n    recovery_available: true,\n"
+  },
+  {
+    "project": "external/scrypt",
+    "file": "Android.bp",
+    "before": "    sdk_version: \"17\",\n    host_supported: true,\n    vendor_available: true,\n",
+    "after": "    sdk_version: \"17\",\n    host_supported: true,\n    vendor_available: true,\n    recovery_available: true,\n"
+  },
+  {
+    "project": "hardware/interfaces",
+    "file": "gatekeeper/aidl/Android.bp",
+    "before": "    name: \"android.hardware.gatekeeper\",\n    vendor_available: true,\n",
+    "after": "    name: \"android.hardware.gatekeeper\",\n    vendor_available: true,\n    recovery_available: true,\n"
+  },
+  {
+    "project": "hardware/interfaces",
+    "file": "secure_element/aidl/Android.bp",
+    "before": "    name: \"android.hardware.secure_element\",\n    vendor_available: true,\n",
+    "after": "    name: \"android.hardware.secure_element\",\n    vendor_available: true,\n    recovery_available: true,\n"
+  },
+  {
+    "project": "hardware/interfaces",
+    "file": "security/keymint/aidl/Android.bp",
+    "before": "    name: \"android.hardware.security.keymint\",\n    vendor_available: true,\n",
+    "after": "    name: \"android.hardware.security.keymint\",\n    vendor_available: true,\n    recovery_available: true,\n"
+  },
+  {
+    "project": "hardware/interfaces",
+    "file": "security/keymint/support/Android.bp",
+    "before": "    name: \"libkeymint_support\",\n    vendor_available: true,\n",
+    "after": "    name: \"libkeymint_support\",\n    vendor_available: true,\n    recovery_available: true,\n"
+  },
+  {
+    "project": "hardware/interfaces",
+    "file": "security/secureclock/aidl/Android.bp",
+    "before": "    name: \"android.hardware.security.secureclock\",\n    vendor_available: true,\n",
+    "after": "    name: \"android.hardware.security.secureclock\",\n    vendor_available: true,\n    recovery_available: true,\n"
+  },
+  {
+    "project": "hardware/interfaces",
+    "file": "weaver/aidl/Android.bp",
+    "before": "    name: \"android.hardware.weaver\",\n    vendor_available: true,\n",
+    "after": "    name: \"android.hardware.weaver\",\n    vendor_available: true,\n    recovery_available: true,\n"
+  }
+]

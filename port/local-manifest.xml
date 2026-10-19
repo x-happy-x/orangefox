@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ANDROID-1 source snapshot: 2026-10-19. Mutable upstream branches pinned. -->
+<manifest>
+  <remove-project name="device/mondrian" />
+  <remove-project name="device/sm84xx-common" />
+  <!-- This experimental upstream project returns HTTP 401. Neither pinned
+       Recovery nor vendor/recovery references libarchive or its BSD tools. -->
+  <remove-project name="external/libarchive" />
+  <!-- The pinned recovery/vendor configs do not select the NAS experiment.
+       rclone depends on the unavailable fox-go project, even at graph time. -->
+  <remove-project name="external/libfuse3" />
+  <remove-project name="external/rclone" />
+  <remove-project name="external/fox-go" />
+  <extend-project name="bionic" path="bionic" revision="33fcbd9974be3b3b2899a484f8c0cb8dfa2d5e82" upstream="refs/heads/fox_16.0" />
+  <extend-project name="bootable/Recovery" path="bootable/recovery" revision="0f7831d3240f4c3925a0b5fd7d2c907ddf8704c2" upstream="refs/heads/fox_16.0" />
+  <extend-project name="build/make" path="build/make" revision="1bffc0092f671d6fc2bd3604c56ccc30856ce4a6" upstream="refs/heads/fox_16.0" />
+  <extend-project name="build/soong" path="build/soong" revision="6dc77879464584ef3f178cae622134ed0bf19e1e" upstream="refs/heads/fox_16.0" />
+  <extend-project name="cts" path="cts" revision="3351fa64bba952382e6727cda63501ed247fe6c0" upstream="refs/heads/fox_16.0" />
+  <extend-project name="device/qcom-twrp-common" path="device/qcom/twrp-common" revision="98506f7919102378c8d52ee7d6a94a867f1b4c55" upstream="refs/heads/fox_16.0" />
+  <extend-project name="android_external_bash" path="external/bash" revision="1094f161361ad75af92c968da680f2f5b3cf752b" upstream="refs/heads/lineage-22.2" />
+  <extend-project name="external/foxcli" path="external/foxcli" revision="ce8125d5dba50b3c03e8c674221206bb7ce5c705" upstream="refs/heads/master" />
+  <extend-project name="external/icu" path="external/icu" revision="6fefff4e125c1b1a332fbce6d0d2da323b203865" upstream="refs/heads/fox_16.0" />
+  <extend-project name="external/json-c" path="external/json-c" revision="79a8ff67c9ec24770b0aacf22ed779a94b1937c9" upstream="refs/heads/fox_16.0" />
+  <extend-project name="external/libchrome" path="external/libchrome" revision="ea5e82b2c1b9e741903be0dcdaf66af60b23c951" upstream="refs/heads/fox_16.0" />
+  <extend-project name="android_external_libncurses" path="external/libncurses" revision="cf8d1a3f3b0ab6f9385c3361e1aada7ecc635ad6" upstream="refs/heads/lineage-22.2" />
+  <extend-project name="external/libuv" path="external/libuv" revision="7c3aedb62ef4b369d41b91d8a6712ebb8fe427a2" upstream="refs/heads/fox_16.0" />
+  <extend-project name="external/libvterm" path="external/libvterm" revision="19d04214c6f276f5eae6f7bcdc1794b7dccf84bd" upstream="refs/heads/fox_16.0" />
+  <extend-project name="external/libwebsockets" path="external/libwebsockets" revision="54fcad4800229f4d75cc74a3254fdb62e2a4b4c8" upstream="refs/heads/fox_16.0" />
+  <extend-project name="external/libxml2" path="external/libxml2" revision="4d33dd4f7f03568c09c7886a6a6d07512daa8374" upstream="refs/heads/fox_16.0" />
+  <extend-project name="phhusson/vendor_lptools" path="external/lptools" revision="c8be7de57b80eab61a6f94ec86464a01fb9056f2" upstream="refs/heads/master" />
+  <extend-project name="external_magisk-prebuilt" path="external/magisk-prebuilt" revision="1e91763f0e216c2a674d018811967e0837b27e0e" upstream="refs/heads/android-12.1" />
+  <extend-project name="android_external_nano" path="external/nano" revision="690d0aee2b55c3648e4e6d0d70313e6d3bbb97af" upstream="refs/heads/lineage-22.2" />
+  <extend-project name="android_external_ntfs-3g" path="external/ntfs-3g" revision="e2415df401538976fb89aa20370903e0c46e51ff" upstream="refs/heads/lineage-22.2" />
+  <extend-project name="external/android-crates-io" path="external/rust/android-crates-io" revision="46022a5c0eb60cbfc7421040ae66c679a63c49dc" upstream="refs/heads/fox_16.0" />
+  <extend-project name="external/se_omapi" path="external/se_omapi" revision="34ba4880a85c935cf311eaf03180a2069408856e" upstream="refs/heads/fox_16.0" />
+  <extend-project name="external/sqlite" path="external/sqlite" revision="28e3f5878182658a5c34d3ce0859e950f2885aba" upstream="refs/heads/fox_16.0" />
+  <extend-project name="external/ttyd" path="external/ttyd" revision="30aa1f9fc7d8500244d125ae0b3338aeb63eb498" upstream="refs/heads/fox_16.0" />
+  <extend-project name="platform/external/wpa_supplicant_8" path="external/wpa_supplicant_8" revision="3ef7b491990ee71f3cbad5c70b274430fa8d5c13" upstream="refs/heads/android16-s2-release" />
+  <extend-project name="external/zstd" path="external/zstd" revision="a375e4fc85612babf34c8221f825a86036175ac0" upstream="refs/heads/fox_16.0" />
+  <extend-project name="frameworks/hardware/interfaces" path="frameworks/hardware/interfaces" revision="51d97a046f77b7dc3531cc6bb99407539d4e29b6" upstream="refs/heads/fox_16.0" />
+  <extend-project name="hardware/interfaces" path="hardware/interfaces" revision="bdefb2a8bce20dc15882d4ab668fb628c427e26b" upstream="refs/heads/fox_16.0" />
+  <extend-project name="android_prebuilts_tools-lineage" path="prebuilts/tools-lineage" revision="6122a667053a09ca0663fcf2486276bf13814080" upstream="refs/heads/lineage-22.2" />
+  <extend-project name="system/core" path="system/core" revision="bd5bd5b11608e17b48d81efe834845e30efbfd52" upstream="refs/heads/fox_16.0" />
+  <extend-project name="system/extras" path="system/extras" revision="3a9f3a49acd8469faa7999800f4cfc0b2ed75ffa" upstream="refs/heads/fox_16.0" />
+  <extend-project name="system/libhidl" path="system/libhidl" revision="9bb79519173ff86773dfd144172bcd789fc88e01" upstream="refs/heads/fox_16.0" />
+  <extend-project name="system/security" path="system/security" revision="d614e274b585a67e80d3d3fbc3a6e9f695998f78" upstream="refs/heads/fox_16.0" />
+  <extend-project name="system/sepolicy" path="system/sepolicy" revision="9641d92817ae79b2d4cd02dfe5c24de7de2014b4" upstream="refs/heads/fox_16.0" />
+  <extend-project name="system/update_engine" path="system/update_engine" revision="c78c40f7a85e5ab7928faf1133cb5eadfc2d1673" upstream="refs/heads/fox_16.0" />
+  <!-- 18 recovery data-safety fixes on top of OrangeFox's vold snapshot. -->
+  <remove-project name="system/vold" />
+  <project name="TWRP-Test/android_system_vold" path="system/vold" remote="github" revision="4c83041ec61f9b482085685f1e6aed5a62f103aa" upstream="refs/heads/twrp-16.0" clone-depth="1" />
+  <!-- Each fork differs from AOSP r1 by one recovery_available declaration. -->
+  <remove-project name="platform/system/keymaster" />
+  <project name="TWRP-Test/android_system_keymaster" path="system/keymaster" remote="github" revision="9e111ed820350961202c637b4135ff83aa06a70b" upstream="refs/heads/twrp-16.0" clone-depth="1" />
+  <remove-project name="platform/system/hardware/interfaces" />
+  <project name="TWRP-Test/android_system_hardware_interfaces" path="system/hardware/interfaces" remote="github" revision="ee6d7c54ce09cffb9808afc86fcd4828be2f077a" upstream="refs/heads/twrp-16.0" clone-depth="1" />
+  <!-- Keep the large framework source on AOSP r1; apply only the OMAPI
+       recovery variant declaration, plus the scrypt recovery variant. -->
+  <extend-project name="platform/frameworks/base" path="frameworks/base" revision="99b01a65cc4c104933788b3143285ab6bae65827" upstream="refs/tags/android-16.0.0_r1" />
+  <extend-project name="platform/external/scrypt" path="external/scrypt" revision="19e0168446d3955ab17c56be1f1d1eb92616c44a" upstream="refs/tags/android-16.0.0_r1" />
+  <extend-project name="vendor/recovery" path="vendor/recovery" revision="ebef8ef3a7066551d93d85652920d11a68e01adc" upstream="refs/heads/main" />
+  <extend-project name="vendor/twrp" path="vendor/twrp" revision="3e0b71f4d1f624f7ea462507a1b974d80cc65627" upstream="refs/heads/fox_16.0" />
+  <remote name="android-dev-device" fetch="https://github.com" />
+  <project name="YuKongA/twrp_device_xiaomi_sm8850" path="device/xiaomi/popsicle" remote="android-dev-device" revision="8023035649595341e26f9b924928c0b0cd67fbd2" upstream="refs/heads/twrp-16.0" clone-depth="1" />
+</manifest>

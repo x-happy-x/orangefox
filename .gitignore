@@ -1,0 +1,9 @@
+.staging/
+artifacts/
+logs/
+*.log
+*.vhdx
+*.tar
+*.tar.gz
+*.wsl
+__pycache__/
