@@ -1,0 +1,8 @@
+[
+  {
+    "project": "vendor/recovery",
+    "file": "OrangeFox_vendor.sh",
+    "before": "  # if a local callback script is declared, run it, passing to it the ramdisk directory (first call)\n  if [ -n \"$FOX_LOCAL_CALLBACK_SCRIPT\" -a -f \"$FOX_LOCAL_CALLBACK_SCRIPT\" ]; then\n\tbash $FOX_LOCAL_CALLBACK_SCRIPT \"$FOX_RAMDISK\" \"--first-call\"\n  fi\n",
+    "after": "  # A declared callback is required: never fall back to unverified root addons.\n  if [ -n \"$FOX_LOCAL_CALLBACK_SCRIPT\" ]; then\n    [ -f \"$FOX_LOCAL_CALLBACK_SCRIPT\" ] || { echo 'Missing required OrangeFox callback' >&2; exit 1; }\n    bash \"$FOX_LOCAL_CALLBACK_SCRIPT\" \"$FOX_RAMDISK\" \"--first-call\" || exit $?\n  fi\n"
+  }
+]

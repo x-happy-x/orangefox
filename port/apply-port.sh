@@ -19,7 +19,19 @@ fi
 
 for name in twrp_popsicle.mk vendorsetup.sh; do
     if [[ -e $tree/$name ]]; then
-        cmp -s "$port_dir/overlay/$name" "$tree/$name" || die "Existing $tree/$name differs from the port overlay."
+        if ! cmp -s "$port_dir/overlay/$name" "$tree/$name"; then
+            # Permit exact ANDROID-1/2 and tested ANDROID-3 preview profiles
+            # to advance to the final, physically verified flashlight channel.
+            # A changed user profile is never silently replaced.
+            old_profile=$(sha256sum "$tree/$name" | cut -d ' ' -f 1)
+            if [[ $name == vendorsetup.sh && ( $old_profile == 988ae94817bbcb8aea852e09dcc982a203ae7ac2d0b9ba0fac4b43d5580861a0 ||
+               $old_profile == 867830cf59b8e7a86b51426ee7e4d90bff716721853a956c745a713de8b2c6d5 ) ]]; then
+                install -m 0644 "$port_dir/overlay/$name" "$tree/$name"
+                printf 'Updated a verified earlier android-dev build profile.\n'
+            else
+                die "Existing $tree/$name differs from all verified port overlays."
+            fi
+        fi
     else
         install -m 0644 "$port_dir/overlay/$name" "$tree/$name"
     fi

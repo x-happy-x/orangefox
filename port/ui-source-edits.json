@@ -1,0 +1,68 @@
+[
+  {
+    "project": "bootable/recovery",
+    "file": "gui/resources.cpp",
+    "before": "\t\t\tfont_size = scale_theme_min(atoi(attr->value()));\n\t\t\torigFontSize = font_size;\n",
+    "after": "\t\t\tfont_size = scale_theme_min(atoi(attr->value()));\n\t\t\t// popsicle: keep saved font choices while making the UI ten percent smaller.\n\t\t\tfont_size = (font_size * 9 + 5) / 10;\n\t\t\tif (font_size < 1)\n\t\t\t\tfont_size = 1;\n\t\t\torigFontSize = font_size;\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "gui/theme/portrait_hdpi/pages/advanced.xml",
+    "before": "\t\t\t\t<listitem name=\"{@module_uninstall} Magisk\">\n\t\t\t\t\t<icon res=\"archive\"/>\n\t\t\t\t\t<action function=\"page\">mod_unmagisk</action>\n\t\t\t\t</listitem>\n",
+    "after": "\t\t\t\t<!-- Magisk removal uses its Manager or a verified stock backup. -->\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "gui/theme/portrait_hdpi/pages/rmmanager.xml",
+    "before": "\t\t\t<button style=\"actionbar\">\n\t\t\t\t<placement x=\"%ab_btn1_x%\" y=\"%ab_y%\" placement=\"4\"/>\n\t\t\t\t<condition var1=\"rmm_type\" var2=\"magisk\"/>\n\t\t\t\t<condition var1=\"fileexists\" var2=\"%fox_magisk_path%/%fox_magisk_uninstaller%\"/>\n\t\t\t\t<action function=\"set\">install_back=modules_mount</action>\n\t\t\t\t<action function=\"page\">mod_unmagisk</action>\n\t\t\t</button>\n\n\t\t\t<image>\n\t\t\t\t<condition var1=\"rmm_type\" var2=\"magisk\"/>\n\t\t\t\t<condition var1=\"fileexists\" var2=\"%fox_magisk_path%/%fox_magisk_uninstaller%\"/>\n\t\t\t\t<placement x=\"%ab_btn1_x%\" y=\"%ab_y%\" placement=\"4\"/>\n\t\t\t\t<image resource=\"actionbar_delete\"/>\n\t\t\t</image>\n\n",
+    "after": "\t\t\t<!-- Magisk removal uses its Manager or a verified stock backup. -->\n\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "gui/listbox.cpp",
+    "before": "\t\tif (attr)\n\t\t\tmVariable = attr->value();\n\n\t\tattr = child->first_attribute(\"default\");",
+    "after": "\t\tif (attr)\n\t\t\tmVariable = attr->value();\n\n\t\t// The file viewer's data value is a path, not a selectable text line.\n\t\tif (mVariable == \"of_file_to_read\")\n\t\t\tallowSelection = false;\n\n\t\tattr = child->first_attribute(\"default\");"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "gui/action.cpp",
+    "before": "int GUIAction::editfile(std::string arg) {\n\tif (term != NULL) {\n\t\tfor (uint8_t iter = 0; iter < arg.size(); iter++)\n\t\t\tterm->NotifyCharInput(arg.at(iter));\n\t\tterm->NotifyCharInput(13);\n\t}\n\telse\n\t\tLOGINFO(\"Unable to switch to Terminal\\n\");\n\treturn 0;\n}\n",
+    "after": "int GUIAction::editfile(std::string arg) {\n\tif (term == NULL) {\n\t\tLOGINFO(\"Unable to switch to Terminal\\n\");\n\t\treturn 1;\n\t}\n\tif (term->status()) {\n\t\tgui_err(\"nano_terminal_busy=Close the current terminal session before opening a file in nano.\");\n\t\treturn 1;\n\t}\n\tif (arg.empty()) {\n\t\tgui_err(\"file_read_error=Unable to open file!\");\n\t\treturn 1;\n\t}\n\n\t// Pass one literal filename to the shell, including spaces and quotes.\n\tstd::string command = \"exec /system/bin/nano -- '\";\n\tfor (unsigned char ch : arg) {\n\t\t// Interactive terminal control bytes must never become part of a command.\n\t\tif (ch < 0x20 || ch == 0x7f) {\n\t\t\tgui_err(\"file_read_error=Unable to open file!\");\n\t\t\treturn 1;\n\t\t}\n\t\tif (ch == '\\'')\n\t\t\tcommand += \"'\\\\''\";\n\t\telse\n\t\t\tcommand += static_cast<char>(ch);\n\t}\n\tcommand += \"'\";\n\n\t// Decode and validate the complete UTF-8 command before sending any input.\n\t// Android builds this module with -fno-exceptions.\n\tstd::wstring input;\n\tfor (size_t offset = 0; offset < command.size();) {\n\t\tunsigned char lead = static_cast<unsigned char>(command[offset]);\n\t\tunsigned int codepoint;\n\t\tunsigned int minimum;\n\t\tsize_t length;\n\t\tif (lead < 0x80) {\n\t\t\tcodepoint = lead;\n\t\t\tminimum = 0;\n\t\t\tlength = 1;\n\t\t} else if (lead >= 0xc2 && lead <= 0xdf) {\n\t\t\tcodepoint = lead & 0x1f;\n\t\t\tminimum = 0x80;\n\t\t\tlength = 2;\n\t\t} else if (lead >= 0xe0 && lead <= 0xef) {\n\t\t\tcodepoint = lead & 0x0f;\n\t\t\tminimum = 0x800;\n\t\t\tlength = 3;\n\t\t} else if (lead >= 0xf0 && lead <= 0xf4) {\n\t\t\tcodepoint = lead & 0x07;\n\t\t\tminimum = 0x10000;\n\t\t\tlength = 4;\n\t\t} else {\n\t\t\tgui_err(\"file_read_error=Unable to open file!\");\n\t\t\treturn 1;\n\t\t}\n\t\tif (length > command.size() - offset) {\n\t\t\tgui_err(\"file_read_error=Unable to open file!\");\n\t\t\treturn 1;\n\t\t}\n\t\tfor (size_t index = 1; index < length; ++index) {\n\t\t\tunsigned char next = static_cast<unsigned char>(command[offset + index]);\n\t\t\tif (next < 0x80 || next > 0xbf) {\n\t\t\t\tgui_err(\"file_read_error=Unable to open file!\");\n\t\t\t\treturn 1;\n\t\t\t}\n\t\t\tcodepoint = (codepoint << 6) | (next & 0x3f);\n\t\t}\n\t\tif (codepoint < minimum || codepoint > 0x10ffff ||\n\t\t    (codepoint >= 0xd800 && codepoint <= 0xdfff) ||\n\t\t    codepoint < 0x20 || (codepoint >= 0x7f && codepoint <= 0x9f)) {\n\t\t\tgui_err(\"file_read_error=Unable to open file!\");\n\t\t\treturn 1;\n\t\t}\n\t\tinput.push_back(static_cast<wchar_t>(codepoint));\n\t\toffset += length;\n\t}\n\t// A fresh editor replaces its shell; Ctrl+X closes this PTY instead of leaving it active.\n\tDataManager::SetValue(\"tw_terminal_location\", \"\");\n\tDataManager::SetValue(\"tw_hide_kb\", 0);\n\tfor (wchar_t ch : input)\n\t\tterm->NotifyCharInput(ch);\n\tterm->NotifyCharInput(13);\n\treturn 0;\n}\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "gui/theme/portrait_hdpi/pages/files.xml",
+    "before": "\t\t\t\t\t<action function=\"editfile\">nano \"%tw_filename1%\"</action>\n",
+    "after": "\t\t\t\t\t<action function=\"editfile\">%tw_filename1%</action>\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "Android.mk",
+    "before": "# Darth9\n#\n# make sure that the nano config directory is copied for nano\nifeq ($(OF_USE_NANO_EDITOR),1)\n\tLOCAL_POST_INSTALL_CMD += \\\n\tmkdir -p $(TARGET_OUT_ETC)/; \\\n\tmkdir -p $(TARGET_RECOVERY_ROOT_OUT)/system/etc/; \\\n\tcp -rf $(TARGET_OUT_ETC)/nano $(TARGET_RECOVERY_ROOT_OUT)/system/etc/;\nendif\n",
+    "after": "# The recovery variant installs nano, its recovery ncurses dependency and\n# its own /system/etc/nano configuration, including the rewritten nanorc paths.\nifeq ($(OF_USE_NANO_EDITOR),1)\nLOCAL_REQUIRED_MODULES += nano_recovery\nendif\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "gui/theme/common/languages/en.xml",
+    "before": "\t\t<string name=\"fm_edit_file\">Edit File in nano</string>\n",
+    "after": "\t\t<string name=\"fm_edit_file\">Edit File in nano</string>\n\t\t<string name=\"nano_terminal_busy\">Close the current terminal session before opening a file in nano.</string>\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "gui/theme/common/languages/ru.xml",
+    "before": "\t\t<string name=\"fm_edit_file\">Редактировать в nano</string>\n",
+    "after": "\t\t<string name=\"fm_edit_file\">Редактировать в nano</string>\n\t\t<string name=\"nano_terminal_busy\">Завершите текущий сеанс терминала, прежде чем открыть файл в nano.</string>\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "fox_fifo/fox_channel.cpp",
+    "before": "int g_input_fd = -1;\nint g_cancel_fd = -1;\n\nvoid setup_command_fifo()\n",
+    "after": "int g_input_fd = -1;\nint g_cancel_fd = -1;\n\n// A CLI writes foxin before opening foxout. Allow a short scheduling window,\n// but never block the GUI indefinitely if that client has already disappeared.\nFILE* open_output_fifo()\n{\n\tconst int attempts = 50;\n\tfor (int attempt = 0; attempt < attempts; ++attempt) {\n\t\tint fd = open(FOX_OUTPUT_FILE, O_WRONLY | O_NONBLOCK | O_CLOEXEC);\n\t\tif (fd >= 0) {\n\t\t\tstruct stat info;\n\t\t\tif (fstat(fd, &info) != 0 || !S_ISFIFO(info.st_mode)) {\n\t\t\t\tclose(fd);\n\t\t\t\treturn nullptr;\n\t\t\t}\n\t\t\tint flags = fcntl(fd, F_GETFL);\n\t\t\tif (flags < 0 || fcntl(fd, F_SETFL, flags & ~O_NONBLOCK) != 0) {\n\t\t\t\tclose(fd);\n\t\t\t\treturn nullptr;\n\t\t\t}\n\t\t\t// Keep ordinary buffered writes for complete, possibly large PNG replies.\n\t\t\tFILE* out = fdopen(fd, \"w\");\n\t\t\tif (!out)\n\t\t\t\tclose(fd);\n\t\t\treturn out;\n\t\t}\n\t\tif (errno != ENXIO && errno != EINTR)\n\t\t\treturn nullptr;\n\t\tif (attempt + 1 < attempts)\n\t\t\tusleep(10000);\n\t}\n\treturn nullptr;\n}\n\nvoid setup_command_fifo()\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "fox_fifo/fox_channel.cpp",
+    "before": "\tFILE* out = fopen(FOX_OUTPUT_FILE, \"w\");\n\tif (!out) {\n\t\tclose_input_fd();\n\t\tset_select_fd();\n\t\tLOGINFO(\"Unable to fopen %s\\n\", FOX_OUTPUT_FILE);\n\t\tunlink(FOX_INPUT_FILE);\n\t\tunlink(FOX_OUTPUT_FILE);\n\t\treturn;\n\t}\n",
+    "after": "\tFILE* out = open_output_fifo();\n\tif (!out) {\n\t\tLOGINFO(\"Fox output reader unavailable; dropping request\\n\");\n\t\tRearmInput();\n\t\treturn;\n\t}\n"
+  }
+]
