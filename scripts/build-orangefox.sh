@@ -28,6 +28,10 @@ printf 'Experimental OrangeFox popsicle Android 16 build\nLog: %s\n' "$log"
 python3 "$toolkit/port/verify-port.py" "$source_dir"
 cd -- "$source_dir"
 export FOX_BUILD_DEVICE=popsicle
+# Load our verified profile explicitly; AOSP vendorsetup allowlists must not
+# silently omit the device's recovery-partition and encryption settings.
+# shellcheck source=../port/overlay/vendorsetup.sh
+source "$source_dir/$DEVICE_PATH/vendorsetup.sh"
 export USE_CCACHE=1 CCACHE_EXEC=/usr/bin/ccache
 export CCACHE_DIR=${CCACHE_DIR:-$HOME/.cache/ccache}
 ccache -M "${CCACHE_MAXSIZE:-30G}"
@@ -40,6 +44,9 @@ source build/envsetup.sh
 lunch "$LUNCH_TARGET"
 [[ ${TARGET_PRODUCT:-} == twrp_popsicle ]] || die 'Unexpected lunch product.'
 [[ $(_get_build_var_cached TARGET_DEVICE) == popsicle ]] || die 'Unexpected lunch device.'
+[[ ${FOX_AB_DEVICE:-} == 1 && ${FOX_VIRTUAL_AB_DEVICE:-} == 1 &&
+   ${OF_AB_DEVICE_WITH_RECOVERY_PARTITION:-} == 1 &&
+   ${OF_KEEP_DM_VERITY_FORCED_ENCRYPTION:-} == 1 ]] || die 'Device build profile was not loaded correctly.'
 mka -j"$jobs" "$BUILD_TARGET"
 set -u
 
@@ -56,7 +63,7 @@ cp "$source_dir/$DEVICE_PATH/twrp_popsicle.mk" "$source_dir/$DEVICE_PATH/vendors
 cp "$toolkit/port/sources.env" "$artifact/"
 cp "$toolkit/port/source-edits.json" "$artifact/"
 cp "$toolkit/port/local-manifest.xml" "$artifact/"
-for project in bootable/recovery hardware/interfaces; do
+for project in bootable/recovery hardware/interfaces frameworks/base external/scrypt; do
     git -C "$source_dir/$project" diff --binary > "$artifact/${project//\//-}.patch"
 done
 cp "$toolkit/port/VALIDATION.md" "$artifact/"
