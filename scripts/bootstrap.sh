@@ -31,14 +31,15 @@ appendWindowsPath=false
 WSLCONF
 install -d -o android -g android /home/android/android-dev /home/android/OrangeFox \
   /home/android/logs /home/android/artifacts /home/android/.cache \
-  /home/android/.cache/ccache /home/android/.cache/go-build
+  /home/android/.cache/go-build /home/android/OrangeFox/out \
+  /home/android/OrangeFox/out/.ccache
 ln -sfn /home/android/android-dev/scripts/android-dev /usr/local/bin/android-dev
 cat > /etc/profile.d/android-dev.sh <<'PROFILE'
 export PATH="$HOME/android-dev/scripts:$PATH"
 export ANDROID_DEV_ROOT="$HOME/android-dev"
 export FOX_SOURCE_DIR="$HOME/OrangeFox"
-export CCACHE_DIR="$HOME/.cache/ccache"
 PROFILE
-runuser -u android -- ccache --max-size=30G
+runuser -u android -- env CCACHE_DIR=/home/android/OrangeFox/out/.ccache \
+  ccache --max-size=30G
 apt-get clean
 echo 'Android build dependencies installed.'

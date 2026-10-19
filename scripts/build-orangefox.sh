@@ -33,7 +33,10 @@ export FOX_BUILD_DEVICE=popsicle
 # shellcheck source=../port/overlay/vendorsetup.sh
 source "$source_dir/$DEVICE_PATH/vendorsetup.sh"
 export USE_CCACHE=1 CCACHE_EXEC=/usr/bin/ccache
-export CCACHE_DIR=${CCACHE_DIR:-$HOME/.cache/ccache}
+# AOSP's build sandbox grants write access to out, not to the rest of HOME.
+export CCACHE_DIR=${CCACHE_DIR:-$source_dir/out/.ccache}
+export CCACHE_TEMPDIR=${CCACHE_TEMPDIR:-$CCACHE_DIR/tmp}
+mkdir -p "$CCACHE_DIR" "$CCACHE_TEMPDIR"
 ccache -M "${CCACHE_MAXSIZE:-30G}"
 
 # AOSP helpers expect ordinary interactive-shell options, including commands
