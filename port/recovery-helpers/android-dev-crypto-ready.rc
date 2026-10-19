@@ -1,0 +1,11 @@
+on property:twrp.variant.files_copied=1 && property:ro.twrp.weaver=nxp
+    start android-dev-crypto-ready
+
+service android-dev-crypto-ready /system/bin/sh /system/bin/android-dev-crypto-ready.sh
+    class hal
+    user root
+    group root
+    disabled
+    oneshot
+    stdio_to_kmsg
+    seclabel u:r:recovery:s0

@@ -1,0 +1,11 @@
+{
+  "ksud": {
+    "version": "3.3.1",
+    "name": "ksud-x86_64-unknown-linux-musl",
+    "size": 8055080,
+    "sha256": "29b50f946a3cc40b04aef3dd587adad227fe0f70edf9c56b02c84479f0b0e954",
+    "url": "https://github.com/tiann/KernelSU/releases/download/v3.3.1/ksud-x86_64-unknown-linux-musl",
+    "source": "https://github.com/tiann/KernelSU/tree/0c0fdb960178fa12d80d6cbcfdcb6ad8be6a865d"
+  },
+  "embedded_aarch64_ksuinit_sha256": "365c66e5435a9ecdb3dbb23ceda2d9253568defeee3682af95220087094eff5d"
+}
