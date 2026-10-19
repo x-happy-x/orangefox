@@ -8,6 +8,7 @@ param(
     [string]$ReferenceFirmware = 'OS3.0.319.0.WPBCNXM',
     [switch]$RecoveryBootTested,
     [switch]$KernelSUBootTested,
+    [switch]$Minimal,
     [switch]$Zip
 )
 
@@ -19,10 +20,12 @@ $templateDir = Join-Path (Split-Path $PSScriptRoot -Parent) 'installer/windows'
 $deviceReport = Join-Path (Split-Path $PSScriptRoot -Parent) 'docs/ANDROID-3-device-test.md'
 Import-Module (Join-Path $templateDir 'recovery-installer.psm1') -Force
 $installerModule = Get-Module 'recovery-installer'
+Import-Module (Join-Path $templateDir 'package-layout.psm1') -Force
+$layout = if ($Minimal) { 'minimal' } else { 'full' }
 
-$source = (Get-Item -LiteralPath $SourceImage).FullName
-$rollback = (Get-Item -LiteralPath $RollbackImage).FullName
-$tools = (Get-Item -LiteralPath $ToolsDir).FullName
+$source = (Get-Item -LiteralPath $SourceImage -Force).FullName
+$rollback = (Get-Item -LiteralPath $RollbackImage -Force).FullName
+$tools = (Get-Item -LiteralPath $ToolsDir -Force).FullName
 $output = [IO.Path]::GetFullPath($OutputDir)
 if (Test-Path -LiteralPath $output) { throw 'OutputDir already exists. Choose a new directory; existing packages are never overwritten.' }
 if ($Zip -and (Test-Path -LiteralPath ($output + '.zip'))) { throw 'The output ZIP already exists.' }
@@ -33,7 +36,7 @@ if ((Get-FileHash -LiteralPath $rollback -Algorithm SHA256).Hash.ToLowerInvarian
 }
 $toolFiles = @('adb.exe', 'fastboot.exe', 'AdbWinApi.dll', 'AdbWinUsbApi.dll', 'libwinpthread-1.dll', 'NOTICE.txt', 'source.properties')
 foreach ($name in $toolFiles) {
-    $file = Get-Item -LiteralPath (Join-Path $tools $name)
+    $file = Get-Item -LiteralPath (Join-Path $tools $name) -Force
     if ($file.PSIsContainer -or ($file.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw "Expected a regular platform-tools file: $name" }
 }
 $properties = Get-Content -LiteralPath (Join-Path $tools 'source.properties') -Raw
@@ -52,18 +55,20 @@ Copy-Item -LiteralPath $deviceReport -Destination (Join-Path $output 'DEVICE-TES
 foreach ($name in $toolFiles) {
     Copy-Item -LiteralPath (Join-Path $tools $name) -Destination (Join-Path $output 'platform-tools')
 }
-Copy-Item -LiteralPath $source -Destination (Join-Path $output 'Images/OrangeFox-popsicle.img')
+$orangefoxPath = if ($Minimal) { 'recovery.img' } else { 'Images/OrangeFox-popsicle.img' }
+Copy-Item -LiteralPath $source -Destination (Join-Path $output $orangefoxPath)
 Copy-Item -LiteralPath $rollback -Destination (Join-Path $output 'Images/TWRP-popsicle.img')
 $files = @()
-foreach ($name in (& $installerModule { Get-RequiredPackageFiles })) {
+foreach ($name in (& $installerModule { param($selectedLayout) Get-RequiredPackageFiles $selectedLayout } $layout)) {
     $path = Join-Path $output $name
     $files += [ordered]@{
-        path = $name; bytes = (Get-Item -LiteralPath $path).Length
+        path = $name; bytes = (Get-Item -LiteralPath $path -Force).Length
         sha256 = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
     }
 }
 $metadata = [ordered]@{
     schema_version = 1
+    layout = $layout
     created_utc = [DateTime]::UtcNow.ToString('o')
     device = [ordered]@{
         product = 'popsicle'; model = 'Xiaomi 17 Pro Max'; android_version = 16
@@ -83,16 +88,19 @@ $metadata = [ordered]@{
     files = $files
 }
 $metadata | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $output 'metadata.json') -Encoding UTF8
+if ($Minimal) { Set-MinimalPackageVisibility -PackageRoot $output }
 & $installerModule { param($root) Assert-PackageIntegrity $root | Out-Null } $output
 $zipPath = $null
 if ($Zip) {
     $zipPath = $output + '.zip'
-    Compress-Archive -LiteralPath $output -DestinationPath $zipPath -CompressionLevel Optimal
+    $archiveFiles = @($files | ForEach-Object { [string]$_['path'] }) + @('metadata.json')
+    New-InstallerPackageArchive -PackageRoot $output -Files $archiveFiles -DestinationPath $zipPath
 }
 $payloadBytes = [long]0
 foreach ($entry in $files) { $payloadBytes += [long]$entry['bytes'] }
 [pscustomobject]@{
     PackageDirectory = $output; Zip = $zipPath
+    Layout = $layout
     OrangeFoxSha256 = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToLowerInvariant()
     RollbackSha256 = $rollbackHash; FirmwareReference = $ReferenceFirmware
     PayloadBytes = $payloadBytes
