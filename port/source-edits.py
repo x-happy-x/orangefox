@@ -51,7 +51,7 @@ def main():
     for path, expected in pending:
         with path.open("w", encoding="utf-8", newline="\n") as stream:
             stream.write(expected)
-    print(f"Source edits {'applied/verified' if args.apply else 'verified'}: recovery keystore API and six HAL recovery variants.")
+    print(f"Source edits {'applied/verified' if args.apply else 'verified'}: recovery keystore API and eight recovery variants.")
 
 
 if __name__ == "__main__":

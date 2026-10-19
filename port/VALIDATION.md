@@ -69,8 +69,12 @@ TWRP-Test vold snapshot rather than dropping those changes. The changes:
 `Android.bp`, Weaver implementation and the FBE/KeyUtil/Keystore public APIs
 remain the same except for `copySqliteDb()` becoming `syncKeystoreDb()`.
 `source-edits.json` updates the one OrangeFox `twrp.cpp` caller exactly as in
-TWRP-Test, and adds its six `recovery_available` declarations for Gatekeeper,
-secure element, KeyMint AIDL/support, secure clock and Weaver. The separate
+TWRP-Test, and adds its eight `recovery_available` declarations for Gatekeeper,
+secure element, KeyMint AIDL/support, secure clock, Weaver, OMAPI AIDL and scrypt.
+The OMAPI AIDL declaration comes from TWRP-Test frameworks/base commit
+`6f7be9d065ea575a34a3e562da6e39e6ca6f594d`; the scrypt declaration comes from
+`6ae39e28aba54ce4e8b394213201c23df5c996ac`. Both source repositories stay on their
+original AOSP r1 commits with these one-line edits. The separate
 keymaster and system/hardware/interfaces snapshots each differ from AOSP r1 by
 one additional recovery variant declaration. These changes let the existing
 recovery dependency graph actually link the required Android 16 HAL libraries.
@@ -123,7 +127,7 @@ firmware, partition table, bootloader state and a known-good TWRP image.
 - Exact allowed device changes; no unrelated edits or replacement kernel.
 - Original kernel size and board AVB/FBE/OMAPI/partition/header invariants.
 - Exact narrow product and overlay configuration.
-- Exact recovery keystore API edit and six HAL recovery variant declarations;
+- Exact recovery keystore API edit and eight recovery variant declarations;
   pinned TWRP-Test vold and its two recovery dependency snapshots.
 - `mka recoveryimage` exit status, image presence, 100 MiB partition size limit.
 - AVB metadata parsing, embedded signature/hash verification with the source

@@ -266,6 +266,20 @@
     "sha": "ee6d7c54ce09cffb9808afc86fcd4828be2f077a"
   },
   {
+    "name": "platform/frameworks/base",
+    "path": "frameworks/base",
+    "url": "https://android.googlesource.com/platform/frameworks/base",
+    "branch": "android-16.0.0_r1",
+    "sha": "99b01a65cc4c104933788b3143285ab6bae65827"
+  },
+  {
+    "name": "platform/external/scrypt",
+    "path": "external/scrypt",
+    "url": "https://android.googlesource.com/platform/external/scrypt",
+    "branch": "android-16.0.0_r1",
+    "sha": "19e0168446d3955ab17c56be1f1d1eb92616c44a"
+  },
+  {
     "name": "vendor/recovery",
     "path": "vendor/recovery",
     "url": "https://gitlab.com/OrangeFox/vendor/recovery.git",

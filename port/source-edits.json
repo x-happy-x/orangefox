@@ -6,6 +6,18 @@
     "after": "android::keystore::syncKeystoreDb();"
   },
   {
+    "project": "frameworks/base",
+    "file": "omapi/aidl/Android.bp",
+    "before": "    name: \"android.se.omapi\",\n    vendor_available: true,\n",
+    "after": "    name: \"android.se.omapi\",\n    vendor_available: true,\n    recovery_available: true,\n"
+  },
+  {
+    "project": "external/scrypt",
+    "file": "Android.bp",
+    "before": "    sdk_version: \"17\",\n    host_supported: true,\n    vendor_available: true,\n",
+    "after": "    sdk_version: \"17\",\n    host_supported: true,\n    vendor_available: true,\n    recovery_available: true,\n"
+  },
+  {
     "project": "hardware/interfaces",
     "file": "gatekeeper/aidl/Android.bp",
     "before": "    name: \"android.hardware.gatekeeper\",\n    vendor_available: true,\n",

@@ -73,7 +73,7 @@ def main():
             require(item["path"] in edited_projects or not git(path, "status", "--porcelain").strip(),
                     f"Source has local changes: {item['path']}")
         subprocess.run([sys.executable, str(PORT / "source-edits.py"), str(root)], check=True)
-    print("Port verified: pinned sources; popsicle-only product; upstream kernel, crypto, fstab and AVB configuration preserved.")
+    print("Port verified: pinned sources; popsicle-only product; device kernel, fstab, crypto and AVB settings preserved.")
 
 
 if __name__ == "__main__":
