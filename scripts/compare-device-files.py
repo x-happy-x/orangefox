@@ -39,9 +39,31 @@ def normalized_path(name):
 def load_reference(path):
     document = json.loads(path.read_text(encoding="utf-8"))
     require(isinstance(document, dict), "Reference must be a JSON object")
-    ramdisk = document.get("ramdisk")
-    require(isinstance(ramdisk, dict), "Reference has no ramdisk object")
-    files = ramdisk.get("selected_device_files")
+    if "ramdisk_files" in document:
+        targets = {
+            "FFiles/OF_Magisk/Magisk.zip": "Magisk.zip",
+            "FFiles/KernelSU/KernelSU_Installer.zip": "KernelSU_Installer.zip",
+            "sbin/ksud": "ksud",
+        }
+        mapping = document["ramdisk_files"]
+        require(isinstance(mapping, dict) and set(mapping) == set(targets),
+                "Unexpected root-addon ramdisk target list")
+        outputs = document.get("outputs")
+        require(isinstance(outputs, dict) and set(outputs) == set(targets.values()),
+                "Unexpected root-addon output list")
+        files = []
+        for name, output in targets.items():
+            require(mapping[name] == outputs[output], f"Root-addon mapping mismatch: {name}")
+            require(isinstance(mapping[name], dict), "Invalid root-addon file entry")
+            files.append({"ramdisk_path": name, **mapping[name]})
+        manifest_bytes = path.read_bytes()
+        files.append({"ramdisk_path": "FFiles/root-addons-manifest.json",
+                      "size": len(manifest_bytes),
+                      "sha256": hashlib.sha256(manifest_bytes).hexdigest()})
+    else:
+        ramdisk = document.get("ramdisk")
+        require(isinstance(ramdisk, dict), "Reference has no ramdisk object")
+        files = ramdisk.get("selected_device_files")
     require(isinstance(files, list) and files, "Reference has no selected_device_files")
     expected = {}
     for item in files:

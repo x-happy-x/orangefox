@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+from source_edits_manifest import load_edits
 
 PORT = Path(__file__).resolve().parent
 DEVICE_REV = "8023035649595341e26f9b924928c0b0cd67fbd2"
@@ -64,8 +65,7 @@ def main():
     if not args.device_only:
         require(git(root / ".repo/manifests", "rev-parse", "HEAD").decode().strip() == MANIFEST_REV,
                 "Manifest snapshot mismatch")
-        edited_projects = {edit["project"] for edit in
-                           json.loads((PORT / "source-edits.json").read_text(encoding="utf-8"))}
+        edited_projects = {edit["project"] for edit in load_edits()}
         for item in json.loads((PORT / "locked-projects.json").read_text(encoding="utf-8")):
             path = root / item["path"]
             require(git(path, "rev-parse", "HEAD").decode().strip() == item["sha"],

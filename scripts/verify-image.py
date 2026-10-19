@@ -16,6 +16,8 @@ def check(condition, message):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("image", type=Path)
+    parser.add_argument("--require-nano", action="store_true",
+                        help="Require the enabled editor binary in the recovery ramdisk")
     args = parser.parse_args()
     image = args.image.resolve()
     size = image.stat().st_size
@@ -47,10 +49,14 @@ def main():
                   "Recovery fstab is missing from the ramdisk")
             check(any("orangefox" in name.lower() or Path(name).name.startswith("fox") for name in names),
                   "OrangeFox runtime files are missing from the ramdisk")
+            if args.require_nano:
+                check(any(name in names for name in ("sbin/nano", "system/bin/nano")),
+                      "The nano editor is enabled but missing from the ramdisk")
     print(json.dumps({
         "image": str(image), "size": size, "header_version": version,
         "kernel_size": kernel_size, "ramdisk_size": ramdisk_size,
         "ramdisk_entries": len(names), "status": "structural checks passed",
+        "nano_required": args.require_nano,
         "hardware_tested": False,
     }, indent=2))
 
