@@ -30,7 +30,8 @@ hostname=android-dev
 appendWindowsPath=false
 WSLCONF
 install -d -o android -g android /home/android/android-dev /home/android/OrangeFox \
-  /home/android/logs /home/android/artifacts /home/android/.cache/ccache
+  /home/android/logs /home/android/artifacts /home/android/.cache \
+  /home/android/.cache/ccache /home/android/.cache/go-build
 ln -sfn /home/android/android-dev/scripts/android-dev /usr/local/bin/android-dev
 cat > /etc/profile.d/android-dev.sh <<'PROFILE'
 export PATH="$HOME/android-dev/scripts:$PATH"

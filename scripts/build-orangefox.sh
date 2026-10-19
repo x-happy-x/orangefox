@@ -36,19 +36,21 @@ export USE_CCACHE=1 CCACHE_EXEC=/usr/bin/ccache
 export CCACHE_DIR=${CCACHE_DIR:-$HOME/.cache/ccache}
 ccache -M "${CCACHE_MAXSIZE:-30G}"
 
-# AOSP envsetup and its build helpers use unset variables. Keep nounset off
-# until the build finishes, including the cached variable lookup and mka.
-set +u
+# AOSP helpers expect ordinary interactive-shell options, including commands
+# whose nonzero status is harmless. Check the setup/build results explicitly.
+trap - ERR
+set +Eeuo pipefail
 # shellcheck disable=SC1091
-source build/envsetup.sh
-lunch "$LUNCH_TARGET"
+source build/envsetup.sh || die "AOSP environment setup failed; see $log"
+lunch "$LUNCH_TARGET" || die "Lunch failed; see $log"
 [[ ${TARGET_PRODUCT:-} == twrp_popsicle ]] || die 'Unexpected lunch product.'
 [[ $(_get_build_var_cached TARGET_DEVICE) == popsicle ]] || die 'Unexpected lunch device.'
 [[ ${FOX_AB_DEVICE:-} == 1 && ${FOX_VIRTUAL_AB_DEVICE:-} == 1 &&
    ${OF_AB_DEVICE_WITH_RECOVERY_PARTITION:-} == 1 &&
    ${OF_KEEP_DM_VERITY_FORCED_ENCRYPTION:-} == 1 ]] || die 'Device build profile was not loaded correctly.'
-mka -j"$jobs" "$BUILD_TARGET"
-set -u
+mka -j"$jobs" "$BUILD_TARGET" || die "Recovery build failed; see $log"
+set -Eeuo pipefail
+trap 'on_error "$?" "$LINENO"' ERR
 
 image=$source_dir/out/target/product/popsicle/recovery.img
 [[ -s $image ]] || die "Build returned success but $image is missing."
