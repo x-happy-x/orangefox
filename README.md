@@ -14,6 +14,27 @@
 Сборка выполняется на ext4 внутри WSL. Общие настройки WSL Windows и другие
 дистрибутивы сценарий установки не меняет.
 
+## Готовая сборка от 19 октября 2026
+
+OrangeFox `R12.0_testing-Unofficial-popsicle` собран из закреплённых исходников
+Android 16. Успешный запуск `mka recoveryimage` занял 7 минут 23 секунды на
+16 потоках. Образ имеет размер 100 MiB, заголовок v4 и LZ4 ramdisk без ядра,
+как опубликованный автором TWRP для этого дерева.
+
+Проверены структура ramdisk, AVB hash descriptor, SHA256 образов, CRC ZIP и
+совпадение вложенного `recovery.img`. Все 27 выбранных файлов fstab/init,
+вариантов оборудования и ueventd побайтно совпали с авторским TWRP.
+Загрузка и расшифровка на телефоне пользователя **не проверялись**.
+
+Артефакты и отчёты:
+
+- Windows: `R:\vm\wsl\android-dev-artifacts\20261019T152705Z\`.
+- WSL: `/home/android/artifacts/android-dev/20261019T152705Z/`.
+- Файлы: `recovery.img`, `OrangeFox-R12.0_testing-Unofficial-popsicle.img`,
+  `OrangeFox-R12.0_testing-Unofficial-popsicle.zip` и `SHA256SUMS`.
+- Подробности: `image-structure.json`, `device-files-compare.json`, `avb-*.txt`,
+  полный `manifest.xml`, патчи, версии пакетов и журнал сборки.
+
 ## Установка с нуля
 
 В PowerShell 7:

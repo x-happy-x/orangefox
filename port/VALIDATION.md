@@ -146,11 +146,28 @@ firmware, partition table, bootloader state and a known-good TWRP image.
   tree's avbtool, and SHA-256 output for images and installer ZIPs.
 - Byte equality between recovery.img and any exported OrangeFox named image;
   matching recovery.img inside its installer ZIP, plus ZIP CRC checks.
+- Exact paths and SHA-256 of the 27 selected device files from the inspected
+  author TWRP, using a streaming LZ4/newc parser with hardlink support.
 - Complete resolved manifest, build log and port sources saved with the image.
 
 `ALLOW_MISSING_DEPENDENCIES := true` is already set by the upstream minimal TWRP
 tree and is preserved. Therefore build success alone is not a dependency or
 runtime completeness guarantee. Inspect any missing-module warnings in the log.
+
+## Actual build result: 2026-10-19
+
+The build in `/home/android/artifacts/android-dev/20261019T152705Z/` completed
+`mka recoveryimage` successfully in 7 minutes 23 seconds with 16 jobs. The full
+source verification also passed after the build. The resulting 100 MiB image
+has boot header v4, no kernel payload, a 57,461,843-byte LZ4 ramdisk and AVB
+algorithm `NONE`; its recovery hash descriptor passed verification. The named
+OrangeFox image is byte-identical to `recovery.img`, and the matching installer
+ZIP passed CRC and embedded-image SHA-256 checks. All 27 selected reference
+device files matched exactly, with no missing or changed files.
+
+These are compilation, source, structure and byte-comparison results. Boot,
+touch, decryption, installer behaviour and Android boot afterwards remain
+untested on the user's phone.
 
 ## Device validation still required
 

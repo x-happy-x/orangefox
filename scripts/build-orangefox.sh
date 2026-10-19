@@ -62,6 +62,8 @@ artifact=$HOME/artifacts/android-dev/$stamp
 mkdir -p "$artifact"
 install -m 0644 "$image" "$artifact/recovery.img"
 python3 "$toolkit/scripts/verify-image.py" "$artifact/recovery.img" > "$artifact/image-structure.json"
+python3 "$toolkit/scripts/compare-device-files.py" "$artifact/recovery.img" \
+    "$toolkit/port/reference-report.json" > "$artifact/device-files-compare.json"
 repo manifest -r -o "$artifact/manifest.xml"
 git -C "$source_dir/$DEVICE_PATH" diff --binary > "$artifact/device-tree.patch"
 cp "$source_dir/$DEVICE_PATH/twrp_popsicle.mk" "$source_dir/$DEVICE_PATH/vendorsetup.sh" "$artifact/"
