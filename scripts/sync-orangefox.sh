@@ -26,13 +26,15 @@ trap 'on_error "$?" "$LINENO"' ERR
 printf 'OrangeFox fox_16.0 snapshot: %s\nDirectory: %s\nLog: %s\n' "$MANIFEST_REV" "$source_dir" "$log"
 
 # repo checks identity through git config; these overrides are process-local.
-export GIT_CONFIG_COUNT=4
+export GIT_CONFIG_COUNT=5
 export GIT_CONFIG_KEY_0=user.name GIT_CONFIG_VALUE_0=android-dev
 export GIT_CONFIG_KEY_1=user.email GIT_CONFIG_VALUE_1=android-dev@localhost
 # Keep the large CTS transfer on the explicitly tested HTTP/1.1 transport.
 # Cover both GitLab's manifest URL and its canonical .git redirect.
 export GIT_CONFIG_KEY_2=http.https://gitlab.com/OrangeFox/cts.version GIT_CONFIG_VALUE_2=HTTP/1.1
 export GIT_CONFIG_KEY_3=http.https://gitlab.com/OrangeFox/cts.git.version GIT_CONFIG_VALUE_3=HTTP/1.1
+# The same transport also completed AOSP snapshots whose earlier fetches failed.
+export GIT_CONFIG_KEY_4=http.https://android.googlesource.com/.version GIT_CONFIG_VALUE_4=HTTP/1.1
 export GIT_TERMINAL_PROMPT=0
 cd -- "$source_dir"
 if [[ -d .repo ]]; then
