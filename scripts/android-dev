@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
-toolkit=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+launcher=$(readlink -f -- "${BASH_SOURCE[0]}")
+toolkit=$(cd -- "$(dirname -- "$launcher")/.." && pwd)
 case "${1:-help}" in
   doctor)
     # shellcheck disable=SC1091
