@@ -10,6 +10,7 @@ if (Test-Path -LiteralPath $OutputPath) { throw "Refusing to replace $OutputPath
 & wsl.exe --terminate $DistroName
 & wsl.exe --export $DistroName $OutputPath
 $hash = Get-FileHash -LiteralPath $OutputPath -Algorithm SHA256
-"$($hash.Hash.ToLowerInvariant())  $([IO.Path]::GetFileName($OutputPath))" |
-    Set-Content -LiteralPath "$OutputPath.sha256" -Encoding ascii
+[IO.File]::WriteAllText("$OutputPath.sha256",
+    "$($hash.Hash.ToLowerInvariant())  $([IO.Path]::GetFileName($OutputPath))`n",
+    [Text.UTF8Encoding]::new($false))
 Write-Output "Import: wsl --import android-dev-restored R:\vm\wsl\android-dev-restored $OutputPath --version 2"
