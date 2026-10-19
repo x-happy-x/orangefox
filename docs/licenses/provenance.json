@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "license_texts": [
+    {
+      "file": "OrangeFox-Recovery-NOTICE.txt",
+      "original_path": "bootable/recovery/NOTICE",
+      "revision": "0f7831d3240f4c3925a0b5fd7d2c907ddf8704c2",
+      "source_url": "https://gitlab.com/OrangeFox/bootable/Recovery/-/blob/0f7831d3240f4c3925a0b5fd7d2c907ddf8704c2/NOTICE",
+      "bytes": 33115,
+      "sha256": "bec25f3fd85684e89eece2cd3e9c8f88b20eb646afed0ce1ef2339860e8b1fe5"
+    },
+    {
+      "file": "OMAPI-LICENSE.txt",
+      "original_path": "external/se_omapi/LICENSE",
+      "revision": "34ba4880a85c935cf311eaf03180a2069408856e",
+      "source_url": "https://gitlab.com/OrangeFox/external/se_omapi/-/blob/34ba4880a85c935cf311eaf03180a2069408856e/LICENSE",
+      "bytes": 774,
+      "sha256": "018010a19666ffcbaa8c0031c2f8c98068520cb55572a0127ec6e23f9074aeea"
+    },
+    {
+      "file": "GNU-nano-COPYING.txt",
+      "original_path": "external/nano/COPYING",
+      "revision": "690d0aee2b55c3648e4e6d0d70313e6d3bbb97af",
+      "source_url": "https://github.com/LineageOS/android_external_nano/blob/690d0aee2b55c3648e4e6d0d70313e6d3bbb97af/COPYING",
+      "bytes": 35068,
+      "sha256": "fc82ca8b6fdb18d4e3e85cfd8ab58d1bcd3f1b29abe782895abd91d64763f8e7"
+    },
+    {
+      "file": "GNU-nano-COPYING-DOC.txt",
+      "original_path": "external/nano/COPYING.DOC",
+      "revision": "690d0aee2b55c3648e4e6d0d70313e6d3bbb97af",
+      "source_url": "https://github.com/LineageOS/android_external_nano/blob/690d0aee2b55c3648e4e6d0d70313e6d3bbb97af/COPYING.DOC",
+      "bytes": 20403,
+      "sha256": "f45cc81b400a048b56c9edbd4c3317f7a8958463dfd55aa96f268ecfd6baa12c"
+    },
+    {
+      "file": "Toybox-LICENSE.txt",
+      "original_path": "external/toybox/LICENSE",
+      "revision": "e21e76d30fa15996188b79affbc25cfd0c13deff",
+      "source_url": "https://android.googlesource.com/platform/external/toybox/+/e21e76d30fa15996188b79affbc25cfd0c13deff/LICENSE",
+      "bytes": 666,
+      "sha256": "948039f91e7e23916019047a035c69214447323c5fc272aefc0fd21e505bf41d"
+    },
+    {
+      "file": "mksh-NOTICE.txt",
+      "original_path": "external/mksh/NOTICE",
+      "revision": "103f7c36340298f42cee2f0fe7101a93a01a14e7",
+      "source_url": "https://android.googlesource.com/platform/external/mksh/+/103f7c36340298f42cee2f0fe7101a93a01a14e7/NOTICE",
+      "bytes": 3088,
+      "sha256": "9d0a1d9cebf03f4a448105f4d79d8625a03aa5227e45b391dd79a1e89a7f0b0d"
+    },
+    {
+      "file": "LZ4-LICENSE.txt",
+      "original_path": "external/lz4/LICENSE",
+      "revision": "f072532f6846b40417438d29daa8183a8e53b63c",
+      "source_url": "https://android.googlesource.com/platform/external/lz4/+/f072532f6846b40417438d29daa8183a8e53b63c/LICENSE",
+      "bytes": 646,
+      "sha256": "4bc9c403f6b679cc076dee210e0e21c27b4e8f6d3fb43d85364c76657bfaaac5"
+    },
+    {
+      "file": "LZ4-lib-LICENSE.txt",
+      "original_path": "external/lz4/lib/LICENSE",
+      "revision": "f072532f6846b40417438d29daa8183a8e53b63c",
+      "source_url": "https://android.googlesource.com/platform/external/lz4/+/f072532f6846b40417438d29daa8183a8e53b63c/lib/LICENSE",
+      "bytes": 1311,
+      "sha256": "8b58c446121a109ccf32edc094bba3010a3d85e4ee3702950db55e4d3e87736c"
+    },
+    {
+      "file": "LZ4-programs-COPYING.txt",
+      "original_path": "external/lz4/programs/COPYING",
+      "revision": "f072532f6846b40417438d29daa8183a8e53b63c",
+      "source_url": "https://android.googlesource.com/platform/external/lz4/+/f072532f6846b40417438d29daa8183a8e53b63c/programs/COPYING",
+      "bytes": 14901,
+      "sha256": "609b910ef05c9c855ecc1da155a36ed0f57514eac452cf93446530b5ea4b3bc3"
+    },
+    {
+      "file": "ncurses-COPYING.txt",
+      "original_path": "external/libncurses/COPYING",
+      "revision": "cf8d1a3f3b0ab6f9385c3361e1aada7ecc635ad6",
+      "source_url": "https://github.com/LineageOS/android_external_libncurses/blob/cf8d1a3f3b0ab6f9385c3361e1aada7ecc635ad6/COPYING",
+      "bytes": 1447,
+      "sha256": "b2feb54f39529abe226f709a292584fde48a2e5721559fee417d2cdd51cb7cc1"
+    },
+    {
+      "file": "AOSP-Apache-2.0.txt",
+      "original_path": "build/soong/licenses/LICENSE",
+      "revision": "6dc77879464584ef3f178cae622134ed0bf19e1e",
+      "source_url": "https://gitlab.com/OrangeFox/build/soong/-/blob/6dc77879464584ef3f178cae622134ed0bf19e1e/licenses/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "file": "Magisk-LICENSE.txt",
+      "original_path": "topjohnwu/Magisk/LICENSE",
+      "revision": "v30.7",
+      "source_url": "https://github.com/topjohnwu/Magisk/blob/v30.7/LICENSE",
+      "bytes": 35141,
+      "sha256": "589ed823e9a84c56feb95ac58e7cf384626b9cbf4fda2a907bc36e103de1bad2"
+    },
+    {
+      "file": "KernelSU-LICENSE.txt",
+      "original_path": "tiann/KernelSU/LICENSE",
+      "revision": "0c0fdb960178fa12d80d6cbcfdcb6ad8be6a865d",
+      "source_url": "https://github.com/tiann/KernelSU/blob/0c0fdb960178fa12d80d6cbcfdcb6ad8be6a865d/LICENSE",
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "file": "KernelSU-kernel-LICENSE.txt",
+      "original_path": "tiann/KernelSU/kernel/LICENSE",
+      "revision": "0c0fdb960178fa12d80d6cbcfdcb6ad8be6a865d",
+      "source_url": "https://github.com/tiann/KernelSU/blob/0c0fdb960178fa12d80d6cbcfdcb6ad8be6a865d/kernel/LICENSE",
+      "bytes": 18092,
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+    },
+    {
+      "file": "Android-platform-tools-36.0.2-NOTICE.txt",
+      "original_path": "platform-tools/NOTICE.txt",
+      "revision": "36.0.2",
+      "source_url": "https://developer.android.com/tools/releases/platform-tools",
+      "bytes": 1161702,
+      "sha256": "bfedfb7b22c5d204baecbccfbb9a6de6e848ef19f9318088f15769bfbf4b8f79"
+    }
+  ]
+}

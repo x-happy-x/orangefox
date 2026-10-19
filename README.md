@@ -1,118 +1,108 @@
-# android-dev
+# OrangeFox для Xiaomi 17 Pro Max (`popsicle`)
 
-Отдельный WSL2-дистрибутив для сборки Android recovery и экспериментального
-порта OrangeFox для **Xiaomi 17 Pro Max (`popsicle`), Android 16**.
+Неофициальный **OrangeFox R12.0 testing для Android 16**. Проверен на одном
+Xiaomi 17 Pro Max с HyperOS `OS3.0.319.0.WPBCNXM`, патчем безопасности
+`2026-08-01` и штатным ядром
+`6.12.23-android16-5-g75e9b1c7ae7c-abogki463945075-4k`.
+Другие устройства, версии прошивки и ядра не проверены.
 
-- Имя WSL: `android-dev`.
-- Диск дистрибутива: `R:\vm\wsl\android-dev\ext4.vhdx`.
-- ОС: Ubuntu 24.04 LTS, пользователь `android`.
-- Исходники сборки внутри Linux: `/home/android/OrangeFox`.
-- Сценарии и порт внутри Linux: `/home/android/android-dev`.
-- Репозиторий сценариев в Windows: `P:\services\android-dev`.
-- Задачи: `ANDROID-1` (среда и сборка), `ANDROID-2` (первая проверка на телефоне),
-  `ANDROID-3` (интерфейс, редактор, root-меню, модули и Windows-установщик).
+## Скачать
 
-Сборка выполняется на ext4 внутри WSL. Общие настройки WSL Windows и другие
-дистрибутивы сценарий установки не меняет.
+[Релиз popsicle-2026-10-19](https://github.com/x-happy-x/orangefox/releases/tag/popsicle-2026-10-19):
 
-## Готовая сборка от 19 октября 2026
+- [Windows-установщик — OrangeFox-popsicle-2026-10-19-minimal.zip](https://github.com/x-happy-x/orangefox/releases/download/popsicle-2026-10-19/OrangeFox-popsicle-2026-10-19-minimal.zip).
+- [recovery.img](https://github.com/x-happy-x/orangefox/releases/download/popsicle-2026-10-19/recovery.img).
+- [OrangeFox-R12.0_testing-Unofficial-popsicle.zip](https://github.com/x-happy-x/orangefox/releases/download/popsicle-2026-10-19/OrangeFox-R12.0_testing-Unofficial-popsicle.zip).
+- [popsicle-2026-10-19-sources.zip](https://github.com/x-happy-x/orangefox/releases/download/popsicle-2026-10-19/popsicle-2026-10-19-sources.zip).
+- [SHA256SUMS](https://github.com/x-happy-x/orangefox/releases/download/popsicle-2026-10-19/SHA256SUMS).
 
-OrangeFox `R12.0_testing-Unofficial-popsicle` собран из закреплённых исходников
-Android 16. Успешный запуск `mka recoveryimage` занял 7 минут 23 секунды на
-16 потоках. Образ имеет размер 100 MiB, заголовок v4 и LZ4 ramdisk без ядра,
-как опубликованный автором TWRP для этого дерева.
+SHA256 `recovery.img`:
 
-Проверены структура ramdisk, AVB hash descriptor, SHA256 образов, CRC ZIP и
-совпадение вложенного `recovery.img`. Все 27 выбранных файлов fstab/init,
-вариантов оборудования и ueventd побайтно совпали с авторским TWRP.
-После сборки выполнен первый запуск на телефоне пользователя с HyperOS
-`OS3.0.319.0.WPBCNXM`: OrangeFox загрузился, пользователь подтвердил работу
-сенсора; основная память расшифровалась. В логе есть отдельная ошибка
-расшифровки профиля `999`. Подробные фактические проверки и ограничения:
-[ANDROID-2](docs/ANDROID-2-device-test.md).
+```text
+0741d416e2f772c9ab109adbacd328f701527442feb7461a16a1c9ad1449a390
+```
 
-Артефакты и отчёты:
+## Установка в Windows
 
-- Windows: `R:\vm\wsl\android-dev-artifacts\20261019T152705Z\`.
-- WSL: `/home/android/artifacts/android-dev/20261019T152705Z/`.
-- Файлы: `recovery.img`, `OrangeFox-R12.0_testing-Unofficial-popsicle.img`,
-  `OrangeFox-R12.0_testing-Unofficial-popsicle.zip` и `SHA256SUMS`.
-- Подробности: `image-structure.json`, `device-files-compare.json`, `avb-*.txt`,
-  полный `manifest.xml`, патчи, версии пакетов и журнал сборки.
+Нужны разблокированный загрузчик, USB-драйвер ADB/fastboot и Windows PowerShell
+5.1. ADB/fastboot уже включены в пакет. Сохраните резервную копию важных данных.
 
-Сборка ANDROID-3 добавляет фонарик через физически проверенный канал
-`yellow:flash-0`, поля и уменьшенный масштаб UI, исправленный просмотрщик,
-nano с клавиатурой и стрелками, выбор Magisk/KernelSU и менеджер модулей.
-Ограничено ожидание отсутствующего клиента RPC. Для повторявшегося отказа
-расшифровки добавлена проверка готовности ADSP и запуска Secure Element:
-ошибка возникала до проверки PIN при получении конфигурации Weaver.
-Пользователь подтвердил редактирование и сохранение текста, размер UI и поля.
-KernelSU 3.3.1 LKM установлен по выбору пользователя: Android загрузился,
-модуль ядра загружен, официальный Manager показывает рабочий статус.
-Magisk на телефон не устанавливался. Точные артефакты, проверки и ограничения:
-[ANDROID-3](docs/ANDROID-3-device-test.md).
+1. Скачайте **minimal.zip**, проверьте его SHA256 по `SHA256SUMS` и полностью
+   распакуйте через Проводник Windows в доступную для записи папку.
+2. Подключите только один Xiaomi 17 Pro Max (`popsicle`). Начать можно из
+   Android, recovery или **bootloader fastboot**. В Android заранее включите
+   отладку по USB и авторизуйте компьютер; fastbootd для этого установщика не подходит.
+3. Запустите **flash.cmd**, прочитайте результат в окне. После успешной записи
+   телефон перезагрузится в OrangeFox.
 
-Итоговая сборка: `R:\vm\wsl\android-dev-artifacts\20261019T204123Z`.
-IMG SHA256: `0741d416e2f772c9ab109adbacd328f701527442feb7461a16a1c9ad1449a390`.
-После перезапуска подтверждены автоматический запуск Secure Element,
-расшифровка с первой попытки и работа физического фонарика.
+В папке видны `flash.cmd` и `recovery.img`; служебные файлы скрыты. Сохраняйте
+весь распакованный пакет. Скрипт проверяет SHA256, модель, разблокировку,
+текущий слот и размер раздела; записывает только `recovery` текущего слота.
+Он не меняет слот, не форматирует данные и не устанавливает root.
+При доступном root ADB до перехода в fastboot сохраняется копия текущего recovery
+в подпапку `backups`.
 
-## Установка с нуля
+Для возврата включённого в пакет проверенного TWRP покажите скрытые файлы и
+запустите **restore-twrp.cmd**. Возврат затрагивает recovery; отдельно
+установленный KernelSU сохраняется.
 
-В PowerShell 7:
+Минимальная раскладка пакета проверяется offline с распаковкой; этот IMG и
+механизм записи Windows-скрипта уже проверены на телефоне. Повторная аппаратная
+проверка только из-за новой раскладки не выполнялась. Отдельный OrangeFox ZIP
+проверен по CRC и совпадению вложенного образа; его прошивка из recovery на
+телефоне не проверялась. Образ не содержит ядра, поэтому команда
+`fastboot boot recovery.img` для него не подтверждена.
+
+## Что работает и что изменено
+
+- Загрузка recovery, сенсор, расшифровка основного хранилища существующим PIN
+  и последующая загрузка Android подтверждены на указанной прошивке.
+- Исправлен запуск Secure Element при поздней готовности ADSP; после новой
+  загрузки recovery файлы открылись с первой попытки.
+- Учтены скруглённые края экрана, уменьшены шрифты, работает кнопка фонарика.
+- Исправлено нажатие на текст в просмотрщике. Редактор nano с экранной
+  клавиатурой и стрелками проверен: `Ctrl+O`, `Enter` — сохранить, `Ctrl+X` — выйти.
+- Есть отдельный выбор Magisk 30.7 / KernelSU 3.3.1 LKM и переход к установленным
+  модулям. Root устанавливается только по отдельному выбору и подтверждению.
+
+**KernelSU 3.3.1 LKM** установлен и проверен загрузкой Android и статусом
+**Working** официального Manager на указанном ядре. В меню модулей проверено
+включение и выключение отдельной пустой тестовой записи. **Magisk проверен
+только патчем файлов образов; на телефон не устанавливался.** Автоматическое
+переключение между root-провайдерами не поддерживается.
+
+Сборка экспериментальная. Дополнительный профиль `999` не подтверждён:
+в журнале была ошибка его расшифровки. OTA, MTP, sideload, OTG, fastbootd,
+установка сторонних ZIP/модулей и все варианты холодного старта не проверены.
+**Всё на ваш страх и риск.** О проблемах пишите в
+[Issues](https://github.com/x-happy-x/orangefox/issues), указав версию прошивки,
+ядро, действия и сообщение об ошибке. Удаляйте из логов личные данные и серийные номера.
+
+Подробные результаты: [проверка устройства](docs/ANDROID-3-device-test.md),
+[исходная проверка](docs/ANDROID-2-device-test.md),
+[root](port/root-addons/README.md), [FBE helper](port/recovery-helpers/notes.md).
+
+## Исходники и повторная сборка
+
+Здесь находятся рецепты порта, manifest, overlay, точные изменения исходников
+и инструменты сборки. Полный AOSP checkout скачивается отдельно в Linux ext4.
+Ревизии закреплены в [sources.env](port/sources.env),
+[local-manifest.xml](port/local-manifest.xml) и
+[locked-projects.json](port/locked-projects.json).
+Обоснование адаптации и проверки: [VALIDATION](port/VALIDATION.md).
+Архив `popsicle-2026-10-19-sources.zip` релиза содержит рецепты публичного тега,
+полный закреплённый build manifest (404 проекта) и применённые изменения;
+upstream-исходники доступны
+по ревизиям этого manifest и ссылкам в рецептах.
+
+В PowerShell 7, из клона ветки `popsicle`:
 
 ```powershell
-& P:\services\android-dev\scripts\install-wsl.ps1
+pwsh -File .\scripts\install-wsl.ps1 -WslRoot "$env:LOCALAPPDATA\WSL"
 wsl -d android-dev
 ```
 
-Установщик скачивает официальный Ubuntu WSL rootfs, проверяет закреплённый
-SHA256, импортирует WSL2 в заданный каталог, ставит пакеты для сборки и копирует
-сценарии в Linux. При совпадении имени существующего WSL или каталога установка
-останавливается; существующие данные не заменяются.
-
-В дистрибутиве доступны Git/Git LFS, Repo, GCC/G++, Java 17, Python 3, ccache,
-ADB/fastboot, инструменты сжатия и проверки shell-скриптов. Пароль пользователю
-не задаётся, административные команды доступны через `sudo`.
-
-## Windows-установщик recovery
-
-Готовая папка: `R:\vm\wsl\OrangeFox-popsicle-2026-10-19`, архив рядом:
-`OrangeFox-popsicle-2026-10-19.zip`.
-
-Полностью распакуйте подготовленный пакет в доступную для записи папку.
-Нужны Windows PowerShell 5.1, USB-драйвер ADB/fastboot, разблокированный
-загрузчик и один подключённый Xiaomi 17 Pro Max (`popsicle`). В обычном
-Android заранее разрешите отладку по USB и авторизуйте компьютер; также
-можно начать из recovery или bootloader fastboot.
-
-Запустите `flash.cmd` для установки OrangeFox. `restore-twrp.cmd` возвращает
-включённый в пакет проверенный исходный TWRP. Скрипты проверяют целостность
-файлов, устройство, загрузчик и размер раздела; записывают recovery только
-текущего слота и после подтверждённого успеха перезагружают в recovery.
-При доступном root ADB перед переходом в bootloader сохраняется бинарная
-копия текущего recovery в папку `backups` рядом с установщиком.
-Возврат TWRP меняет только recovery; установленный отдельно KernelSU сохраняется.
-
-Установка recovery не устанавливает root. Magisk и KernelSU выбираются
-отдельно в меню OrangeFox. KernelSU LKM остаётся экспериментальным; установка
-и загрузка проверены на указанной выше версии HyperOS. Magisk проверен только
-на файлах образов без установки на телефон. Состав и проверки новой версии:
-[ANDROID-3](docs/ANDROID-3-device-test.md).
-
-Пакет формируется из проверенного IMG командой:
-
-```powershell
-& .\scripts\package-windows-installer.ps1 -SourceImage <путь-к-img> -OutputDir <новая-папка> -Zip
-```
-
-Параметр `-RecoveryBootTested` добавляется только после фактической проверки
-загрузки этого IMG, `-KernelSUBootTested` — после установки и загрузки выбранного
-KernelSU на устройстве. Существующий выходной каталог не перезаписывается.
-
-## Работа
-
-Внутри WSL:
+В подготовленном WSL:
 
 ```bash
 android-dev doctor
@@ -120,52 +110,36 @@ android-dev sync
 BUILD_JOBS=16 android-dev build
 ```
 
-Первое получение исходников и первая сборка требуют много места и времени.
-Исходники следует оставлять на Linux ext4. Для ccache выделено до 30 GiB.
-Параметры порта и точные ревизии описаны в каталоге `port/`.
+Сборка сохраняет IMG/ZIP, SHA256, полный manifest и отчёты проверок в
+`~/artifacts/android-dev/`. Сценарии сборки не прошивают телефон.
+[Локальная среда и экспорт WSL](docs/LOCAL-ENVIRONMENT.md),
+[состав публикации](docs/PUBLICATION.md).
 
-После сетевого сбоя повторите `android-dev sync`: уже полученные Git-объекты
-переиспользуются. Параллелизм загрузки задаётся через `SYNC_JOBS`, сборки — через
-`BUILD_JOBS`; без этих переменных используются четыре процесса.
+Спасибо [OrangeFox](https://gitlab.com/OrangeFox),
+[Team Win / TWRP](https://github.com/TeamWin),
+[YuKongA за дерево SM8850](https://github.com/YuKongA/twrp_device_xiaomi_sm8850)
+и [TWRP-Test за Android 16 recovery-компоненты](https://github.com/TWRP-Test).
+Root-компоненты: [Magisk](https://github.com/topjohnwu/Magisk) и
+[KernelSU](https://github.com/tiann/KernelSU);
+точные upstream-релизы, исходные ревизии и SHA256 перечислены в
+[releases.json](port/root-addons/releases.json).
+Авторство, исходные лицензии и копии уведомлений собраны в
+[THIRD-PARTY](docs/THIRD-PARTY.md) и входят в архив исходников релиза.
 
-Результаты сборки с контрольными суммами, полным manifest и отчётами проверки
-сохраняются в `/home/android/artifacts/android-dev/<UTC-дата>/`, журналы —
-в `/home/android/logs/android-dev/`. Перед сборкой сценарий проверяет ревизии
-исходников и точный состав изменений порта.
+## English
 
-## Экспорт и восстановление
+Unofficial OrangeFox R12.0 testing for **Xiaomi 17 Pro Max (`popsicle`), Android 16**.
+Tested only on HyperOS `OS3.0.319.0.WPBCNXM` with the stock kernel listed above.
+Download the **minimal Windows installer** from the release, verify SHA256,
+extract the entire archive using Windows Explorer and run `flash.cmd`.
+An unlocked bootloader and ADB/fastboot drivers are required. Start from
+authorized Android, recovery or bootloader fastboot. Keep hidden support files;
+`restore-twrp.cmd` restores the bundled known-working TWRP to the current recovery slot.
 
-После завершения сборки в PowerShell:
-
-```powershell
-& P:\services\android-dev\scripts\export-wsl.ps1
-```
-
-Будут созданы `R:\vm\wsl\android-dev.tar` и файл SHA256. Экспорт останавливает
-только `android-dev`. Архив содержит установленную среду и все файлы её Linux
-диска на момент экспорта, включая полученные исходники и результаты сборки.
-
-Уже сохранённый `R:\vm\wsl\android-dev.tar` — снимок первой сборки ANDROID-1,
-89,26 GiB. Изменения ANDROID-3 находятся в установленном WSL и отдельных
-артефактах; большой архив повторно не экспортировался.
-
-Восстановление под новым именем:
-
-```powershell
-wsl --import android-dev-restored R:\vm\wsl\android-dev-restored R:\vm\wsl\android-dev.tar --version 2
-wsl -d android-dev-restored
-```
-
-## Проверка на устройстве
-
-Сценарии подготовки среды и сборки не прошивают телефон. Отдельная ручная
-операция `ANDROID-2` выполнена по явному запросу пользователя: сохранены и
-проверены исходные `recovery_a`/`recovery_b`, IMG записан только в `recovery_a`.
-Второй слот сохранил исходный TWRP; прочитанные хеши обоих разделов проверены
-после запуска OrangeFox. ZIP-установщик не использовался.
-
-Порт остаётся экспериментальным. Проверка одной версии HyperOS не подтверждает
-совместимость с другими прошивками или работу всех функций. Статус загрузки,
-сенсора, расшифровки, возврата в Android и непроверенных возможностей приведён
-в [последнем отчёте устройства](docs/ANDROID-3-device-test.md). Бэкапы recovery не заменяют
-резервную копию личных данных.
+Boot, touch, main-user decryption, text editing, flashlight and Android boot
+were confirmed. KernelSU 3.3.1 LKM booted and Manager reported **Working**;
+Magisk received file-only tests. Other firmware/kernels, profile 999 and unlisted
+features remain unvalidated. **Use at your own risk; report problems in
+[Issues](https://github.com/x-happy-x/orangefox/issues).** This repository contains
+pinned port/build recipes, not a full AOSP checkout. See the linked device reports
+for exact test scope.
