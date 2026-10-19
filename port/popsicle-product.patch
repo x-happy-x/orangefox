@@ -1,0 +1,20 @@
+diff --git a/Android.mk b/Android.mk
+--- a/Android.mk
++++ b/Android.mk
+@@ -6,6 +6,6 @@
+ 
+ LOCAL_PATH := $(call my-dir)
+ 
+-ifeq ($(TARGET_DEVICE),sm8850)
++ifeq ($(TARGET_DEVICE),popsicle)
+ include $(call all-subdir-makefiles,$(LOCAL_PATH))
+ endif
+diff --git a/AndroidProducts.mk b/AndroidProducts.mk
+--- a/AndroidProducts.mk
++++ b/AndroidProducts.mk
+@@ -5,4 +5,4 @@
+ #
+ 
+ PRODUCT_MAKEFILES := \
+-    $(LOCAL_DIR)/twrp_sm8850.mk
++    $(LOCAL_DIR)/twrp_popsicle.mk

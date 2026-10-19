@@ -1,7 +1,9 @@
 * text=auto
 *.sh text eol=lf
+scripts/android-dev text eol=lf
+*.env text eol=lf
 *.py text eol=lf
 *.ps1 text eol=crlf
 *.xml text eol=lf
 *.mk text eol=lf
-*.patch text eol=lf
+*.patch text eol=lf whitespace=-blank-at-eol

@@ -1,0 +1,268 @@
+[
+  {
+    "name": "bionic",
+    "path": "bionic",
+    "url": "https://gitlab.com/OrangeFox/bionic.git",
+    "branch": "fox_16.0",
+    "sha": "33fcbd9974be3b3b2899a484f8c0cb8dfa2d5e82"
+  },
+  {
+    "name": "bootable/Recovery",
+    "path": "bootable/recovery",
+    "url": "https://gitlab.com/OrangeFox/bootable/Recovery.git",
+    "branch": "fox_16.0",
+    "sha": "0f7831d3240f4c3925a0b5fd7d2c907ddf8704c2"
+  },
+  {
+    "name": "build/make",
+    "path": "build/make",
+    "url": "https://gitlab.com/OrangeFox/build/make.git",
+    "branch": "fox_16.0",
+    "sha": "1bffc0092f671d6fc2bd3604c56ccc30856ce4a6"
+  },
+  {
+    "name": "build/soong",
+    "path": "build/soong",
+    "url": "https://gitlab.com/OrangeFox/build/soong.git",
+    "branch": "fox_16.0",
+    "sha": "6dc77879464584ef3f178cae622134ed0bf19e1e"
+  },
+  {
+    "name": "cts",
+    "path": "cts",
+    "url": "https://gitlab.com/OrangeFox/cts.git",
+    "branch": "fox_16.0",
+    "sha": "3351fa64bba952382e6727cda63501ed247fe6c0"
+  },
+  {
+    "name": "device/qcom-twrp-common",
+    "path": "device/qcom/twrp-common",
+    "url": "https://gitlab.com/OrangeFox/device/qcom-twrp-common.git",
+    "branch": "fox_16.0",
+    "sha": "98506f7919102378c8d52ee7d6a94a867f1b4c55"
+  },
+  {
+    "name": "android_external_bash",
+    "path": "external/bash",
+    "url": "https://github.com/LineageOS/android_external_bash.git",
+    "branch": "lineage-22.2",
+    "sha": "1094f161361ad75af92c968da680f2f5b3cf752b"
+  },
+  {
+    "name": "external/foxcli",
+    "path": "external/foxcli",
+    "url": "https://gitlab.com/OrangeFox/external/foxcli.git",
+    "branch": "master",
+    "sha": "ce8125d5dba50b3c03e8c674221206bb7ce5c705"
+  },
+  {
+    "name": "external/icu",
+    "path": "external/icu",
+    "url": "https://gitlab.com/OrangeFox/external/icu.git",
+    "branch": "fox_16.0",
+    "sha": "6fefff4e125c1b1a332fbce6d0d2da323b203865"
+  },
+  {
+    "name": "external/json-c",
+    "path": "external/json-c",
+    "url": "https://gitlab.com/OrangeFox/external/json-c.git",
+    "branch": "fox_16.0",
+    "sha": "79a8ff67c9ec24770b0aacf22ed779a94b1937c9"
+  },
+  {
+    "name": "external/libchrome",
+    "path": "external/libchrome",
+    "url": "https://gitlab.com/OrangeFox/external/libchrome.git",
+    "branch": "fox_16.0",
+    "sha": "ea5e82b2c1b9e741903be0dcdaf66af60b23c951"
+  },
+  {
+    "name": "android_external_libncurses",
+    "path": "external/libncurses",
+    "url": "https://github.com/LineageOS/android_external_libncurses.git",
+    "branch": "lineage-22.2",
+    "sha": "cf8d1a3f3b0ab6f9385c3361e1aada7ecc635ad6"
+  },
+  {
+    "name": "external/libuv",
+    "path": "external/libuv",
+    "url": "https://gitlab.com/OrangeFox/external/libuv.git",
+    "branch": "fox_16.0",
+    "sha": "7c3aedb62ef4b369d41b91d8a6712ebb8fe427a2"
+  },
+  {
+    "name": "external/libvterm",
+    "path": "external/libvterm",
+    "url": "https://gitlab.com/OrangeFox/external/libvterm.git",
+    "branch": "fox_16.0",
+    "sha": "19d04214c6f276f5eae6f7bcdc1794b7dccf84bd"
+  },
+  {
+    "name": "external/libwebsockets",
+    "path": "external/libwebsockets",
+    "url": "https://gitlab.com/OrangeFox/external/libwebsockets.git",
+    "branch": "fox_16.0",
+    "sha": "54fcad4800229f4d75cc74a3254fdb62e2a4b4c8"
+  },
+  {
+    "name": "external/libxml2",
+    "path": "external/libxml2",
+    "url": "https://gitlab.com/OrangeFox/external/libxml2.git",
+    "branch": "fox_16.0",
+    "sha": "4d33dd4f7f03568c09c7886a6a6d07512daa8374"
+  },
+  {
+    "name": "phhusson/vendor_lptools",
+    "path": "external/lptools",
+    "url": "https://github.com/phhusson/vendor_lptools.git",
+    "branch": "master",
+    "sha": "c8be7de57b80eab61a6f94ec86464a01fb9056f2"
+  },
+  {
+    "name": "external_magisk-prebuilt",
+    "path": "external/magisk-prebuilt",
+    "url": "https://github.com/TeamWin/external_magisk-prebuilt.git",
+    "branch": "android-12.1",
+    "sha": "1e91763f0e216c2a674d018811967e0837b27e0e"
+  },
+  {
+    "name": "android_external_nano",
+    "path": "external/nano",
+    "url": "https://github.com/LineageOS/android_external_nano.git",
+    "branch": "lineage-22.2",
+    "sha": "690d0aee2b55c3648e4e6d0d70313e6d3bbb97af"
+  },
+  {
+    "name": "android_external_ntfs-3g",
+    "path": "external/ntfs-3g",
+    "url": "https://github.com/LineageOS/android_external_ntfs-3g.git",
+    "branch": "lineage-22.2",
+    "sha": "e2415df401538976fb89aa20370903e0c46e51ff"
+  },
+  {
+    "name": "external/android-crates-io",
+    "path": "external/rust/android-crates-io",
+    "url": "https://gitlab.com/OrangeFox/external/android-crates-io.git",
+    "branch": "fox_16.0",
+    "sha": "46022a5c0eb60cbfc7421040ae66c679a63c49dc"
+  },
+  {
+    "name": "external/se_omapi",
+    "path": "external/se_omapi",
+    "url": "https://gitlab.com/OrangeFox/external/se_omapi.git",
+    "branch": "fox_16.0",
+    "sha": "34ba4880a85c935cf311eaf03180a2069408856e"
+  },
+  {
+    "name": "external/sqlite",
+    "path": "external/sqlite",
+    "url": "https://gitlab.com/OrangeFox/external/sqlite.git",
+    "branch": "fox_16.0",
+    "sha": "28e3f5878182658a5c34d3ce0859e950f2885aba"
+  },
+  {
+    "name": "external/ttyd",
+    "path": "external/ttyd",
+    "url": "https://gitlab.com/OrangeFox/external/ttyd.git",
+    "branch": "fox_16.0",
+    "sha": "30aa1f9fc7d8500244d125ae0b3338aeb63eb498"
+  },
+  {
+    "name": "platform/external/wpa_supplicant_8",
+    "path": "external/wpa_supplicant_8",
+    "url": "https://android.googlesource.com/platform/external/wpa_supplicant_8.git",
+    "branch": "android16-s2-release",
+    "sha": "3ef7b491990ee71f3cbad5c70b274430fa8d5c13"
+  },
+  {
+    "name": "external/zstd",
+    "path": "external/zstd",
+    "url": "https://gitlab.com/OrangeFox/external/zstd.git",
+    "branch": "fox_16.0",
+    "sha": "a375e4fc85612babf34c8221f825a86036175ac0"
+  },
+  {
+    "name": "frameworks/hardware/interfaces",
+    "path": "frameworks/hardware/interfaces",
+    "url": "https://gitlab.com/OrangeFox/frameworks/hardware/interfaces.git",
+    "branch": "fox_16.0",
+    "sha": "51d97a046f77b7dc3531cc6bb99407539d4e29b6"
+  },
+  {
+    "name": "hardware/interfaces",
+    "path": "hardware/interfaces",
+    "url": "https://gitlab.com/OrangeFox/hardware/interfaces.git",
+    "branch": "fox_16.0",
+    "sha": "bdefb2a8bce20dc15882d4ab668fb628c427e26b"
+  },
+  {
+    "name": "android_prebuilts_tools-lineage",
+    "path": "prebuilts/tools-lineage",
+    "url": "https://github.com/LineageOS/android_prebuilts_tools-lineage.git",
+    "branch": "lineage-22.2",
+    "sha": "6122a667053a09ca0663fcf2486276bf13814080"
+  },
+  {
+    "name": "system/core",
+    "path": "system/core",
+    "url": "https://gitlab.com/OrangeFox/system/core.git",
+    "branch": "fox_16.0",
+    "sha": "bd5bd5b11608e17b48d81efe834845e30efbfd52"
+  },
+  {
+    "name": "system/extras",
+    "path": "system/extras",
+    "url": "https://gitlab.com/OrangeFox/system/extras.git",
+    "branch": "fox_16.0",
+    "sha": "3a9f3a49acd8469faa7999800f4cfc0b2ed75ffa"
+  },
+  {
+    "name": "system/libhidl",
+    "path": "system/libhidl",
+    "url": "https://gitlab.com/OrangeFox/system/libhidl.git",
+    "branch": "fox_16.0",
+    "sha": "9bb79519173ff86773dfd144172bcd789fc88e01"
+  },
+  {
+    "name": "system/security",
+    "path": "system/security",
+    "url": "https://gitlab.com/OrangeFox/system/security.git",
+    "branch": "fox_16.0",
+    "sha": "d614e274b585a67e80d3d3fbc3a6e9f695998f78"
+  },
+  {
+    "name": "system/sepolicy",
+    "path": "system/sepolicy",
+    "url": "https://gitlab.com/OrangeFox/system/sepolicy.git",
+    "branch": "fox_16.0",
+    "sha": "9641d92817ae79b2d4cd02dfe5c24de7de2014b4"
+  },
+  {
+    "name": "system/update_engine",
+    "path": "system/update_engine",
+    "url": "https://gitlab.com/OrangeFox/system/update_engine.git",
+    "branch": "fox_16.0",
+    "sha": "c78c40f7a85e5ab7928faf1133cb5eadfc2d1673"
+  },
+  {
+    "name": "system/vold",
+    "path": "system/vold",
+    "url": "https://gitlab.com/OrangeFox/system/vold.git",
+    "branch": "fox_16.0",
+    "sha": "953de9608eb78380b3c4e39e801c2bc0af7dbddc"
+  },
+  {
+    "name": "vendor/recovery",
+    "path": "vendor/recovery",
+    "url": "https://gitlab.com/OrangeFox/vendor/recovery.git",
+    "branch": "main",
+    "sha": "ebef8ef3a7066551d93d85652920d11a68e01adc"
+  },
+  {
+    "name": "vendor/twrp",
+    "path": "vendor/twrp",
+    "url": "https://gitlab.com/OrangeFox/vendor/twrp.git",
+    "branch": "fox_16.0",
+    "sha": "3e0b71f4d1f624f7ea462507a1b974d80cc65627"
+  }
+]
