@@ -72,6 +72,9 @@ fi
 # Callback inputs live outside Make's dependency graph. Always repack so a
 # changed verified addon recipe cannot leave an older payload in recovery.img.
 rm -f -- "$source_dir/out/target/product/popsicle/obj/PACKAGING/recovery_intermediates/ramdisk_files-timestamp" || die 'Unable to invalidate recovery packaging timestamp.'
+# The phony relink module does not rerun when an already-built shared library
+# changes. Refresh its generated stamp so the ramdisk receives the current lib.
+rm -f -- "$source_dir/out/target/product/popsicle/obj/FAKE/relink_libraries_intermediates/relink_libraries-timestamp" || die 'Unable to refresh recovery shared-library staging.'
 mka -j"$jobs" "$BUILD_TARGET" || die "Recovery build failed; see $log"
 set -Eeuo pipefail
 trap 'on_error "$?" "$LINENO"' ERR
@@ -83,6 +86,25 @@ artifact=$HOME/artifacts/android-dev/$stamp
 mkdir -p "$artifact"
 install -m 0644 "$image" "$artifact/recovery.img"
 python3 "$toolkit/scripts/verify-image.py" --require-nano "$artifact/recovery.img" > "$artifact/image-structure.json"
+python3 - "$source_dir" "$artifact/display-library-reference.json" <<'PY'
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+library = Path(sys.argv[1]) / "out/target/product/popsicle/system/lib64/libminuitwrp.so"
+data = library.read_bytes()
+for marker in (b"vendor.display.enable_spr_bypass", b"setting up %s, bypass %u"):
+    if marker not in data:
+        raise SystemExit("Built display library is missing the verified SPR bypass support")
+reference = {"ramdisk": {"selected_device_files": [{
+    "ramdisk_path": "system/lib64/libminuitwrp.so", "size": len(data),
+    "sha256": hashlib.sha256(data).hexdigest(),
+}]}}
+Path(sys.argv[2]).write_text(json.dumps(reference, indent=2) + "\n", encoding="utf-8")
+PY
+python3 "$toolkit/scripts/compare-device-files.py" "$artifact/recovery.img" \
+    "$artifact/display-library-reference.json" > "$artifact/display-library-compare.json"
 python3 "$toolkit/scripts/compare-device-files.py" "$artifact/recovery.img" \
     "$toolkit/port/reference-report.json" > "$artifact/device-files-compare.json"
 python3 - "$toolkit/port/recovery-helpers" "$artifact/recovery-helpers-reference.json" <<'PY'
@@ -125,6 +147,7 @@ cp "$toolkit/port/sources.env" "$artifact/"
 cp "$toolkit/port/source-edits.json" "$artifact/"
 cp "$toolkit/port/ui-source-edits.json" "$toolkit/port/root-source-edits.json" "$artifact/"
 cp "$toolkit/port/modules-source-edits.json" "$toolkit/port/ui-notes.md" "$toolkit/port/modules-notes.md" "$artifact/"
+cp "$toolkit/port/display-source-edits.json" "$toolkit/port/display-notes.md" "$artifact/"
 cp "$toolkit/port/source_edits_manifest.py" "$toolkit/scripts/prepare-root-addons.py" "$artifact/"
 cp "$toolkit/port/local-manifest.xml" "$artifact/"
 for project in bootable/recovery vendor/recovery hardware/interfaces frameworks/base external/scrypt; do

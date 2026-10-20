@@ -1,0 +1,50 @@
+[
+  {
+    "project": "bootable/recovery",
+    "file": "minuitwrp/graphics_drm.cpp",
+    "before": "#define SPR_INIT_PARAM_SIZE_6 7\nenum class SPRPackType {\n",
+    "after": "#define SPR_INIT_PARAM_SIZE_6 7\n#define SPR_FLAG_BYPASS (1 << 0)\nenum class SPRPackType {\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "minuitwrp/graphics_drm.cpp",
+    "before": "static uint32_t spr_enabled;\nstatic std::string spr_prop_name;\n",
+    "after": "static uint32_t spr_enabled;\nstatic uint32_t spr_bypass;\nstatic std::string spr_prop_name;\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "minuitwrp/graphics_drm.cpp",
+    "before": "  drm_msm_spr_init_cfg spr_init_cfg;\n",
+    "after": "  drm_msm_spr_init_cfg spr_init_cfg = {};\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "minuitwrp/graphics_drm.cpp",
+    "before": "  spr_init_cfg.flags = 0;\n",
+    "after": "  spr_init_cfg.flags = spr_bypass ? SPR_FLAG_BYPASS : 0;\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "minuitwrp/graphics_drm.cpp",
+    "before": "  drm_msm_spr_init_cfg_v2 spr_init_cfg_v2;\n",
+    "after": "  drm_msm_spr_init_cfg_v2 spr_init_cfg_v2 = {};\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "minuitwrp/graphics_drm.cpp",
+    "before": "  spr_init_cfg_v2.flags = 0;\n",
+    "after": "  spr_init_cfg_v2.flags = spr_bypass ? SPR_FLAG_BYPASS : 0;\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "minuitwrp/graphics_drm.cpp",
+    "before": "  spr_enabled = android::base::GetIntProperty(\"vendor.display.enable_spr\", 0);\n",
+    "after": "  spr_enabled = android::base::GetIntProperty(\"vendor.display.enable_spr\", 0);\n  spr_bypass = android::base::GetIntProperty(\"vendor.display.enable_spr_bypass\", 0);\n"
+  },
+  {
+    "project": "bootable/recovery",
+    "file": "minuitwrp/graphics_drm.cpp",
+    "before": "  /* Setup spr blob id if enabled */\n  if (spr_enabled) {\n    if (SetupSprBlob(drm_fd, spr_prop_name, &crtc_res.spr_blob_id)) {\n",
+    "after": "  /* Setup spr blob id if enabled */\n  if (spr_enabled) {\n    printf(\"setting up %s, bypass %u\\n\", spr_prop_name.c_str(), spr_bypass);\n    if (SetupSprBlob(drm_fd, spr_prop_name, &crtc_res.spr_blob_id)) {\n"
+  }
+]
