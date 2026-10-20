@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "inputs": {
+    "schema": 1,
+    "device": "popsicle",
+    "kernel_release": "6.12.23-android16-5-g75e9b1c7ae7c-abogki463945075-4k",
+    "kmi": "android16-6.12",
+    "stock_boot_sha256": "1f60fade7cee54881d1851be89166124a19a9ee6eb4054d6df37724204a5e84b",
+    "stock_init_boot_sha256": "09a09d5126b8f849365921f827b648d0a5228ec8e3cd35ce64784842ff62e900",
+    "stock_hash_origin": "Read-only full boot_a/init_boot_a backups from the user's unrooted popsicle on 2026-10-19; root options require revalidation after firmware changes.",
+    "assets": {
+      "magisk": {
+        "version": "30.7",
+        "name": "Magisk-v30.7.apk",
+        "size": 11613864,
+        "sha256": "e0d32d2123532860f97123d927b1bb86c4e08e6fd8a48bfc6b5bee0afae9ebd5",
+        "url": "https://github.com/topjohnwu/Magisk/releases/download/v30.7/Magisk-v30.7.apk",
+        "source": "https://github.com/topjohnwu/Magisk/tree/v30.7"
+      },
+      "ksud": {
+        "version": "3.3.1",
+        "name": "ksud-aarch64-linux-android",
+        "size": 6402736,
+        "sha256": "049491e2b4cc0a6c913d3920cb90b8c94c9e8ca96c0ee92818293304973bfb1b",
+        "url": "https://github.com/tiann/KernelSU/releases/download/v3.3.1/ksud-aarch64-linux-android",
+        "source": "https://github.com/tiann/KernelSU/tree/0c0fdb960178fa12d80d6cbcfdcb6ad8be6a865d"
+      },
+      "ksud_patcher": {
+        "version": "3.3.1",
+        "name": "ksud-aarch64-unknown-linux-musl",
+        "size": 8079088,
+        "sha256": "2ea47fad00d5d9de4c4affd9e733ef1ba50a9f97c10fe50b767a20fa103d581a",
+        "url": "https://github.com/tiann/KernelSU/releases/download/v3.3.1/ksud-aarch64-unknown-linux-musl",
+        "source": "https://github.com/tiann/KernelSU/tree/0c0fdb960178fa12d80d6cbcfdcb6ad8be6a865d"
+      },
+      "lkm": {
+        "version": "3.3.1",
+        "name": "lkm-aarch64-android16-6.12_kernelsu.ko",
+        "size": 404928,
+        "sha256": "7e25d68419d08535d35e3630d9f0ff1a08e97a7026d36e878991eecb13554d9f",
+        "url": "https://github.com/tiann/KernelSU/releases/download/v3.3.1/lkm-aarch64-android16-6.12_kernelsu.ko",
+        "source": "https://github.com/tiann/KernelSU/tree/0c0fdb960178fa12d80d6cbcfdcb6ad8be6a865d"
+      },
+      "ksu_manager": {
+        "version": "3.3.1",
+        "name": "KernelSU_v3.3.1_32680-release.apk",
+        "size": 13637206,
+        "sha256": "b4a059ace71de2fa65cc7f12b1c58d55fc23ab25e057ee4230ce779742abe450",
+        "url": "https://github.com/tiann/KernelSU/releases/download/v3.3.1/KernelSU_v3.3.1_32680-release.apk",
+        "source": "https://github.com/tiann/KernelSU/tree/0c0fdb960178fa12d80d6cbcfdcb6ad8be6a865d"
+      }
+    }
+  },
+  "recipe_sha256": "45e505cfcab27d75a78794688d07c84d9dce1276f49ac69785468822165c7381",
+  "lkm_vermagic": "6.12.76-4k SMP preempt mod_unload modversions aarch64",
+  "outputs": {
+    "Magisk.zip": {
+      "sha256": "48cb2bcedcc1bf40b290bb0e6be6bb9464faa37fe63207ff515a2e415ff01c84",
+      "size": 11906383
+    },
+    "KernelSU_Installer.zip": {
+      "sha256": "cfa73a2f401d83f398e266dc2e048b0017a380e423e3e1b387953c222d1a78be",
+      "size": 20372960
+    },
+    "ksud": {
+      "sha256": "049491e2b4cc0a6c913d3920cb90b8c94c9e8ca96c0ee92818293304973bfb1b",
+      "size": 6402736
+    }
+  },
+  "ramdisk_files": {
+    "FFiles/OF_Magisk/Magisk.zip": {
+      "sha256": "48cb2bcedcc1bf40b290bb0e6be6bb9464faa37fe63207ff515a2e415ff01c84",
+      "size": 11906383
+    },
+    "FFiles/KernelSU/KernelSU_Installer.zip": {
+      "sha256": "cfa73a2f401d83f398e266dc2e048b0017a380e423e3e1b387953c222d1a78be",
+      "size": 20372960
+    },
+    "sbin/ksud": {
+      "sha256": "049491e2b4cc0a6c913d3920cb90b8c94c9e8ca96c0ee92818293304973bfb1b",
+      "size": 6402736
+    }
+  }
+}

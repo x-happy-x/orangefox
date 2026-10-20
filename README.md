@@ -1,25 +1,23 @@
 # OrangeFox для Xiaomi 17 Pro Max
 
-Неофициальная сборка для **popsicle, Android 16**.
-Проверена на HyperOS `OS3.0.319.0.WPBCNXM`.
+Неофициальный порт для **popsicle, Android 16**. Сопровождение: **x-happy-x**.
 
-**[Скачать релиз](https://github.com/x-happy-x/orangefox/releases/tag/popsicle-2026-10-19)**
+Два варианта загрузки:
 
-1. Нужен разблокированный загрузчик и USB-драйвер ADB/fastboot.
-2. Скачайте minimal ZIP и полностью распакуйте через Проводник Windows.
-3. Подключите телефон в **Fastboot** и запустите **flash.cmd**.
-   После прошивки телефон сам загрузится в OrangeFox.
+- [recovery.img](https://github.com/x-happy-x/orangefox/releases/download/popsicle-2026-10-20/recovery.img)
+- [Windows-установщик ZIP](https://github.com/x-happy-x/orangefox/releases/download/popsicle-2026-10-20/OrangeFox-popsicle-2026-10-20.zip)
 
-В папке видны только `flash.cmd` и `recovery.img`. Скрытые служебные файлы
-тоже нужны — не удаляйте их. Для возврата TWRP покажите скрытые файлы и
-запустите `restore-twrp.cmd`. Root устанавливается отдельно в меню recovery.
+Для Windows полностью распакуйте ZIP через Проводник, подключите телефон в
+**Fastboot** и запустите **flash.cmd**. Нужны разблокированный загрузчик и
+USB-драйвер ADB/fastboot. Скрытые служебные файлы тоже нужны — не удаляйте их.
+Root выбирается отдельно в меню recovery.
 
-**Всё на ваш страх и риск. Перед прошивкой сделайте бэкап.**
+**Прошивка на ваш страх и риск. Заранее сохраните резервные копии.**
 О проблемах пишите в [Issues](https://github.com/x-happy-x/orangefox/issues):
-укажите прошивку, что делали и какую ошибку получили.
+укажите версию прошивки, действия и ошибку; удалите личные данные из логов.
 
-[Проверки и ограничения](docs/PUBLICATION.md) ·
-[Сборка и WSL](docs/LOCAL-ENVIRONMENT.md) ·
-[Авторы и лицензии](docs/THIRD-PARTY.md)
+[Проверки релиза](docs/ANDROID-5-release.md) ·
+[Исходники и лицензии](docs/THIRD-PARTY.md) ·
+[Сборка и WSL](docs/LOCAL-ENVIRONMENT.md)
 
-Основа — OrangeFox/TWRP, дерево устройства — YuKongA.
+Основа — OrangeFox, дерево устройства — YuKongA.

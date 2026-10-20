@@ -1,0 +1,72 @@
+diff --git a/gatekeeper/aidl/Android.bp b/gatekeeper/aidl/Android.bp
+index 88c10b7..01bc11a 100644
+--- a/gatekeeper/aidl/Android.bp
++++ b/gatekeeper/aidl/Android.bp
+@@ -10,6 +10,7 @@ package {
+ aidl_interface {
+     name: "android.hardware.gatekeeper",
+     vendor_available: true,
++    recovery_available: true,
+     defaults: [
+         "android.hardware.security.keymint-latest-defaults",
+     ],
+diff --git a/secure_element/aidl/Android.bp b/secure_element/aidl/Android.bp
+index 1145305..af7fa38 100644
+--- a/secure_element/aidl/Android.bp
++++ b/secure_element/aidl/Android.bp
+@@ -11,6 +11,7 @@ package {
+ aidl_interface {
+     name: "android.hardware.secure_element",
+     vendor_available: true,
++    recovery_available: true,
+     host_supported: true,
+     srcs: ["android/hardware/secure_element/*.aidl"],
+     stability: "vintf",
+diff --git a/security/keymint/aidl/Android.bp b/security/keymint/aidl/Android.bp
+index 195e47b..b4494fb 100644
+--- a/security/keymint/aidl/Android.bp
++++ b/security/keymint/aidl/Android.bp
+@@ -10,6 +10,7 @@ package {
+ aidl_interface {
+     name: "android.hardware.security.keymint",
+     vendor_available: true,
++    recovery_available: true,
+     srcs: [
+         "android/hardware/security/keymint/*.aidl",
+     ],
+diff --git a/security/keymint/support/Android.bp b/security/keymint/support/Android.bp
+index 7050141..13f9ec8 100644
+--- a/security/keymint/support/Android.bp
++++ b/security/keymint/support/Android.bp
+@@ -26,6 +26,7 @@ package {
+ cc_library {
+     name: "libkeymint_support",
+     vendor_available: true,
++    recovery_available: true,
+     cflags: [
+         "-Wall",
+         "-Wextra",
+diff --git a/security/secureclock/aidl/Android.bp b/security/secureclock/aidl/Android.bp
+index 1d4ec58..6047e2f 100644
+--- a/security/secureclock/aidl/Android.bp
++++ b/security/secureclock/aidl/Android.bp
+@@ -10,6 +10,7 @@ package {
+ aidl_interface {
+     name: "android.hardware.security.secureclock",
+     vendor_available: true,
++    recovery_available: true,
+     frozen: true,
+     srcs: [
+         "android/hardware/security/secureclock/*.aidl",
+diff --git a/weaver/aidl/Android.bp b/weaver/aidl/Android.bp
+index c494d29..d061555 100644
+--- a/weaver/aidl/Android.bp
++++ b/weaver/aidl/Android.bp
+@@ -11,6 +11,7 @@ package {
+ aidl_interface {
+     name: "android.hardware.weaver",
+     vendor_available: true,
++    recovery_available: true,
+     srcs: ["android/hardware/weaver/*.aidl"],
+     stability: "vintf",
+     backend: {

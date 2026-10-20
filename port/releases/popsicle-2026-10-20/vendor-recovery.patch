@@ -1,0 +1,18 @@
+diff --git a/OrangeFox_vendor.sh b/OrangeFox_vendor.sh
+index 9a918ad..ffb5cc4 100755
+--- a/OrangeFox_vendor.sh
++++ b/OrangeFox_vendor.sh
+@@ -1726,9 +1726,10 @@ if [ "$FOX_VENDOR_CMD" = "Fox_Before_Recovery_Image" ]; then
+   $CP -p $FOX_VENDOR_PATH/Files/translators.txt $FOX_RAMDISK/twres/translators.txt
+   $CP -p $FOX_VENDOR_PATH/Files/changelog.txt $FOX_RAMDISK/twres/changelog.txt
+ 
+-  # if a local callback script is declared, run it, passing to it the ramdisk directory (first call)
+-  if [ -n "$FOX_LOCAL_CALLBACK_SCRIPT" -a -f "$FOX_LOCAL_CALLBACK_SCRIPT" ]; then
+-	bash $FOX_LOCAL_CALLBACK_SCRIPT "$FOX_RAMDISK" "--first-call"
++  # A declared callback is required: never fall back to unverified root addons.
++  if [ -n "$FOX_LOCAL_CALLBACK_SCRIPT" ]; then
++    [ -f "$FOX_LOCAL_CALLBACK_SCRIPT" ] || { echo 'Missing required OrangeFox callback' >&2; exit 1; }
++    bash "$FOX_LOCAL_CALLBACK_SCRIPT" "$FOX_RAMDISK" "--first-call" || exit $?
+   fi
+ 
+   # compress some executables?

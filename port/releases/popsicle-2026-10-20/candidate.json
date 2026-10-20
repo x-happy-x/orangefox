@@ -1,0 +1,11 @@
+{
+  "build": "20261020T080341Z",
+  "state": "candidate-awaiting-phone-display-diagnostics",
+  "image_sha256": "c4c8d630deefd4fee94d3c9d76f9373b35e89f6ecda3c1656ef34686107a4a98",
+  "installer_sha256": "892c9eca186cf8c317ce7901b3f09ef5efb361379ede7df393525fabc2b7679b",
+  "installer_bytes": 90993119,
+  "maintainer": "x-happy-x",
+  "statusbar_height": 108,
+  "physical_display_colors_verified": false,
+  "display_renderer_changed": false
+}
