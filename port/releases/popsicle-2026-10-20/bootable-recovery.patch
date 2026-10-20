@@ -774,6 +774,72 @@ index 6bf9044..8991e05 100644
  				<action function="page">modules_unmount</action>
  			</action>
  		</page>
+diff --git a/minuitwrp/graphics_drm.cpp b/minuitwrp/graphics_drm.cpp
+index 0cc80f5..0443abd 100644
+--- a/minuitwrp/graphics_drm.cpp
++++ b/minuitwrp/graphics_drm.cpp
+@@ -83,6 +83,7 @@ struct drm_surface {
+ #define SPR_INIT_PARAM_SIZE_4 24
+ #define SPR_INIT_PARAM_SIZE_5 32
+ #define SPR_INIT_PARAM_SIZE_6 7
++#define SPR_FLAG_BYPASS (1 << 0)
+ enum class SPRPackType {
+   kPentile,
+   kRGBW,
+@@ -238,6 +239,7 @@ static struct Connector conn_res;
+ static struct Plane plane_res[NUM_PLANES];
+ static uint32_t number_of_lms = DEFAULT_NUM_LMS;
+ static uint32_t spr_enabled;
++static uint32_t spr_bypass;
+ static std::string spr_prop_name;
+ 
+ #define find_prop_id(_res, type, Type, obj_id, prop_name, prop_id)    \
+@@ -370,12 +372,12 @@ static int SetupSprBlobV1(int fd, uint32_t* blob_id) {
+   SPRFilterType filter_type = SPRFilterType::kFourTap;
+   SPRAdaptiveModeType adpative_mode = SPRAdaptiveModeType::kYYGM;
+ 
+-  drm_msm_spr_init_cfg spr_init_cfg;
++  drm_msm_spr_init_cfg spr_init_cfg = {};
+   spr_init_cfg.cfg0 = 1;
+   spr_init_cfg.cfg1 = 1;
+   spr_init_cfg.cfg2 = 1;
+   spr_init_cfg.cfg3 = 0;
+-  spr_init_cfg.flags = 0;
++  spr_init_cfg.flags = spr_bypass ? SPR_FLAG_BYPASS : 0;
+   spr_init_cfg.cfg4 = (pack_type == SPRPackType::kRGBW);
+   spr_init_cfg.cfg5 = kDefaultColorPhaseIncrement.at(pack_type);
+   spr_init_cfg.cfg6 = kDefaultColorPhaseRepeat.at(pack_type);
+@@ -409,12 +411,12 @@ static int SetupSprBlobV2(int fd, uint32_t* blob_id) {
+   SPRFilterType filter_type = SPRFilterType::kFourTap;
+   SPRAdaptiveModeType adpative_mode = SPRAdaptiveModeType::kYYGM;
+ 
+-  drm_msm_spr_init_cfg_v2 spr_init_cfg_v2;
++  drm_msm_spr_init_cfg_v2 spr_init_cfg_v2 = {};
+   spr_init_cfg_v2.cfg0 = 1;
+   spr_init_cfg_v2.cfg1 = 1;
+   spr_init_cfg_v2.cfg2 = 1;
+   spr_init_cfg_v2.cfg3 = 0;
+-  spr_init_cfg_v2.flags = 0;
++  spr_init_cfg_v2.flags = spr_bypass ? SPR_FLAG_BYPASS : 0;
+   spr_init_cfg_v2.cfg4 = (pack_type == SPRPackType::kRGBW);
+   spr_init_cfg_v2.cfg5 = kDefaultColorPhaseIncrement.at(pack_type);
+   spr_init_cfg_v2.cfg6 = kDefaultColorPhaseRepeat.at(pack_type);
+@@ -935,6 +937,7 @@ static GRSurface* drm_init(minui_backend* backend __unused) {
+   drmModeRes* res = nullptr;
+ 
+   spr_enabled = android::base::GetIntProperty("vendor.display.enable_spr", 0);
++  spr_bypass = android::base::GetIntProperty("vendor.display.enable_spr_bypass", 0);
+   /* Consider DRM devices in order. */
+   for (int i = 0; i < DRM_MAX_MINOR; i++) {
+     char* dev_name;
+@@ -1124,6 +1127,7 @@ static GRSurface* drm_init(minui_backend* backend __unused) {
+ 
+   /* Setup spr blob id if enabled */
+   if (spr_enabled) {
++    printf("setting up %s, bypass %u\n", spr_prop_name.c_str(), spr_bypass);
+     if (SetupSprBlob(drm_fd, spr_prop_name, &crtc_res.spr_blob_id)) {
+       return NULL;
+     }
 diff --git a/twrp.cpp b/twrp.cpp
 index d8221d5..15b0e05 100644
 --- a/twrp.cpp

@@ -1,11 +1,16 @@
 {
-  "build": "20261020T080341Z",
-  "state": "candidate-awaiting-phone-display-diagnostics",
-  "image_sha256": "c4c8d630deefd4fee94d3c9d76f9373b35e89f6ecda3c1656ef34686107a4a98",
-  "installer_sha256": "892c9eca186cf8c317ce7901b3f09ef5efb361379ede7df393525fabc2b7679b",
-  "installer_bytes": 90993119,
+  "build_stamp": "20261020T082441Z",
+  "state": "hardware-verified",
+  "recovery_sha256": "efad86390600a1510665c23201a33ca0af3324fa270dbe4992de25b91fd21801",
+  "installer_zip_sha256": "cd687c30a2fc9c3184c478a6b2d891d550ec48ed546af674556ac64b7cd9cf04",
   "maintainer": "x-happy-x",
-  "statusbar_height": 108,
-  "physical_display_colors_verified": false,
-  "display_renderer_changed": false
+  "status_bar_height": 108,
+  "physical_display_colors_verified": true,
+  "display_renderer_changed": true,
+  "display_change": "Honor configured SPR bypass; zero-initialize SPR V1/V2 blobs",
+  "packed_display_library_sha256": "2201176a72f346e1691d84f5ffdaf855f64342794756a339521a2fe54c033ed4",
+  "recovery_a_readback_matches": true,
+  "data_decryption_verified": true,
+  "installer_zip_bytes": 90993490,
+  "status_bar_position_verified": true
 }
