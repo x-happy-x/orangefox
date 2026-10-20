@@ -25,7 +25,8 @@ for name in twrp_popsicle.mk vendorsetup.sh; do
             # A changed user profile is never silently replaced.
             old_profile=$(sha256sum "$tree/$name" | cut -d ' ' -f 1)
             if [[ $name == vendorsetup.sh && ( $old_profile == 988ae94817bbcb8aea852e09dcc982a203ae7ac2d0b9ba0fac4b43d5580861a0 ||
-               $old_profile == 867830cf59b8e7a86b51426ee7e4d90bff716721853a956c745a713de8b2c6d5 ) ]]; then
+               $old_profile == 867830cf59b8e7a86b51426ee7e4d90bff716721853a956c745a713de8b2c6d5 ||
+               $old_profile == 519ec5fe633424bd34261186507701421dbe4cdc06ccc544748cd34a4865cc16 ) ]]; then
                 install -m 0644 "$port_dir/overlay/$name" "$tree/$name"
                 printf 'Updated a verified earlier android-dev build profile.\n'
             else

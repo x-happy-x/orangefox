@@ -4,7 +4,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression
 
-function Set-MinimalPackageVisibility {
+function Set-InstallerPackageVisibility {
     param([Parameter(Mandatory = $true)][string]$PackageRoot)
     foreach ($item in @(Get-ChildItem -LiteralPath $PackageRoot -Force)) {
         if ($item.Name -cin @('flash.cmd', 'recovery.img')) {
@@ -106,4 +106,4 @@ function New-InstallerPackageArchive {
     }
 }
 
-Export-ModuleMember -Function Set-MinimalPackageVisibility, New-InstallerPackageArchive
+Export-ModuleMember -Function Set-InstallerPackageVisibility, New-InstallerPackageArchive

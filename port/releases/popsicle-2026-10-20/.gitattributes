@@ -1,0 +1,5 @@
+*.xml -text -whitespace
+*.patch -text -whitespace
+*.json -text
+*.mk -text
+*.sh -text

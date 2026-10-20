@@ -1,0 +1,12 @@
+diff --git a/omapi/aidl/Android.bp b/omapi/aidl/Android.bp
+index 3916bf3df..0f70861ae 100644
+--- a/omapi/aidl/Android.bp
++++ b/omapi/aidl/Android.bp
+@@ -19,6 +19,7 @@ package {
+ aidl_interface {
+     name: "android.se.omapi",
+     vendor_available: true,
++    recovery_available: true,
+     srcs: ["android/se/omapi/*.aidl"],
+     stability: "vintf",
+     backend: {

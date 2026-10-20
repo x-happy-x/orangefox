@@ -17,12 +17,12 @@ function Assert-IntegrityFailure([string]$Root, [string]$Expected) {
     catch { $failure = $_.Exception.Message }
     Assert-True ($failure -like $Expected) ('Unexpected integrity outcome: ' + $failure)
 }
-$temporary = Join-Path ([IO.Path]::GetTempPath()) ('android-dev-minimal-tests-' + [Guid]::NewGuid().ToString('N'))
+$temporary = Join-Path ([IO.Path]::GetTempPath()) ('android-dev-package-tests-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $temporary | Out-Null
 try {
     $root = Join-Path $temporary 'portable fixture'
     New-Item -ItemType Directory -Path $root | Out-Null
-    $names = @(& $module { Get-RequiredPackageFiles 'minimal' })
+    $names = @(& $module { Get-RequiredPackageFiles })
     foreach ($name in $names) {
         $path = Join-Path $root $name
         $parent = Split-Path $path -Parent
@@ -40,29 +40,27 @@ try {
             [IO.File]::WriteAllText($path, "Pkg.Revision=36.0.2`n")
         } else { [IO.File]::WriteAllText($path, 'Not executable: synthetic offline package ' + $name) }
     }
-    $rollbackHash = (Get-FileHash -LiteralPath (Join-Path $root 'Images/TWRP-popsicle.img') -Algorithm SHA256).Hash.ToLowerInvariant()
-    & $module { param($fixtureHash) $script:RollbackSha256 = $fixtureHash } $rollbackHash
     $records = @()
     foreach ($name in $names) {
         $path = Join-Path $root $name
         $records += @{ path = $name; bytes = (Get-Item -LiteralPath $path -Force).Length; sha256 = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() }
     }
     $metadata = @{
-        schema_version = 1; layout = 'minimal'; device = @{ product = 'popsicle' }
+        schema_version = 2; device = @{ product = 'popsicle' }
         partition_size_bytes = 104857600; platform_tools_version = '36.0.2'; files = $records
     }
     $metadataPath = Join-Path $root 'metadata.json'
     $metadata | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $metadataPath -Encoding UTF8
-    Set-MinimalPackageVisibility $root
+    Set-InstallerPackageVisibility $root
     $visible = @(Get-ChildItem -LiteralPath $root | Sort-Object Name | ForEach-Object { $_.Name })
-    Assert-True (($visible -join ',') -ceq 'flash.cmd,recovery.img') 'Minimal package has unexpected visible root entries.'
+    Assert-True (($visible -join ',') -ceq 'flash.cmd,recovery.img') 'Package has unexpected visible root entries.'
     $package = & $module { param($path) Assert-PackageIntegrity $path } $root
-    Assert-True ($package.OrangeFox -ceq (Join-Path $root 'recovery.img')) 'Minimal layout selected an arbitrary image path.'
-    Assert-True ($package.Rollback -ceq (Join-Path $root 'Images/TWRP-popsicle.img')) 'Minimal layout lost the pinned rollback path.'
-    Pass 'minimal package exposes two files and validates every real Hidden payload'
+    Assert-True ($package.OrangeFox -ceq (Join-Path $root 'recovery.img')) 'Package selected an arbitrary image path.'
+    Assert-True (@($names | Where-Object { $_ -like '*.img' }).Count -eq 1) 'Package must contain exactly one recovery image.'
+    Pass 'single-image package exposes two files and validates every real Hidden payload'
 
     $process = & $module { param($path) New-DeviceProcess $path 'fastboot' @('-s', 'MOCK123', 'devices') } $root
-    try { Assert-True ($process.StartInfo.FileName -ceq (Join-Path $root 'platform-tools/fastboot.exe')) 'Minimal layout changed the checked bundled executable path.' }
+    try { Assert-True ($process.StartInfo.FileName -ceq (Join-Path $root 'platform-tools/fastboot.exe')) 'Package changed the checked bundled executable path.' }
     finally { $process.Dispose() }
     Pass 'hidden bundled tool resolves without starting a native process'
 
@@ -85,15 +83,14 @@ Write-Output 'HIDDEN_RUNTIME_LOADED'
     Assert-True ($LASTEXITCODE -eq 0 -and ($loaderOutput -join "`n") -like '*HIDDEN_RUNTIME_LOADED*') 'Hidden PowerShell -File/module loading failed.'
     Pass 'actual PowerShell host can load Hidden script and runtime module without device calls'
 
-    $metadata.layout = 'unsupported'
+    foreach ($schema in @(1, 99)) {
+        $metadata.schema_version = $schema
+        $metadata | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $metadataPath -Encoding UTF8 -Force
+        Assert-IntegrityFailure $root '*Unsupported package metadata*'
+    }
+    $metadata.schema_version = 2
     $metadata | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $metadataPath -Encoding UTF8 -Force
-    Assert-IntegrityFailure $root '*Unsupported package layout*'
-    $metadata.layout = 'full'
-    $metadata | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $metadataPath -Encoding UTF8 -Force
-    Assert-IntegrityFailure $root '*Unexpected or duplicate package file: recovery.img*'
-    $metadata.layout = 'minimal'
-    $metadata | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $metadataPath -Encoding UTF8 -Force
-    Pass 'unknown layouts and minimal image paths in full-layout metadata are rejected'
+    Pass 'legacy and unknown package schemas are rejected'
 
     $hiddenRuntime = Join-Path $root 'install-recovery.ps1'
     [IO.File]::AppendAllText($hiddenRuntime, 'tampered')
@@ -106,7 +103,15 @@ Write-Output 'HIDDEN_RUNTIME_LOADED'
     $zip = Join-Path $temporary 'portable fixture.zip'
     $archiveFiles = $names + @('metadata.json')
     New-InstallerPackageArchive -PackageRoot $root -Files $archiveFiles -DestinationPath $zip
-    Pass 'explicit allowlist ZIP includes Hidden files with verified sizes, hashes and DOS attributes'
+    $zipStream = [IO.File]::OpenRead($zip)
+    $zipArchive = [IO.Compression.ZipArchive]::new($zipStream, [IO.Compression.ZipArchiveMode]::Read, $false)
+    try {
+        $payloadNames = @($zipArchive.Entries | Where-Object { -not $_.FullName.EndsWith('/') } | ForEach-Object { $_.FullName })
+        Assert-True (@($payloadNames | Where-Object { $_ -match '(?i)\.md$|README|TWRP|restore' }).Count -eq 0) 'ZIP contains documentation or another recovery payload.'
+        Assert-True (@($payloadNames | Where-Object { $_ -like '*.img' }).Count -eq 1) 'ZIP must contain exactly one image.'
+        Assert-True (@($payloadNames | Where-Object { $_ -like '*/platform-tools/NOTICE.txt' }).Count -eq 1) 'ZIP lost required tool notices.'
+    } finally { $zipArchive.Dispose(); $zipStream.Dispose() }
+    Pass 'allowlist ZIP verifies all hashes/attributes and contains one image, tool notices and no documentation or restore payload'
 
     $badZip = Join-Path $temporary 'must-not-exist.zip'
     foreach ($badFiles in @(@('flash.cmd', '../outside'), @('flash.cmd', 'flash.cmd'))) {
@@ -142,8 +147,8 @@ Write-Output 'HIDDEN_RUNTIME_LOADED'
     Assert-True $complete 'Explorer extraction did not finish before the deadline.'
     & $module { param($path) Assert-PackageIntegrity $path } $extractedRoot | Out-Null
     $visible = @(Get-ChildItem -LiteralPath $extractedRoot | Sort-Object Name | ForEach-Object { $_.Name })
-    Assert-True (($visible -join ',') -ceq 'flash.cmd,recovery.img') 'Explorer extraction lost the minimal root visibility.'
-    foreach ($name in @('Images', 'platform-tools', 'install-recovery.ps1', 'metadata.json')) {
+    Assert-True (($visible -join ',') -ceq 'flash.cmd,recovery.img') 'Explorer extraction lost the root visibility.'
+    foreach ($name in @('platform-tools', 'install-recovery.ps1', 'metadata.json')) {
         Assert-True (((Get-Item -LiteralPath (Join-Path $extractedRoot $name) -Force).Attributes -band [IO.FileAttributes]::Hidden) -ne 0) ('Explorer lost Hidden: ' + $name)
     }
     Pass 'actual Explorer ZIP extraction preserves Hidden directories/files and full integrity'
@@ -153,27 +158,23 @@ Write-Output 'HIDDEN_RUNTIME_LOADED'
     & $module { param($path) Assert-PackageIntegrity $path } (Join-Path $alternate 'portable fixture') | Out-Null
     Pass 'PowerShell extraction remains usable even when its extractor strips Hidden'
 
-    # Legacy packages omit layout. Keep their original Images path and full payload list.
-    $fullRoot = Join-Path $temporary 'legacy-full'
-    Copy-Item -LiteralPath $root -Destination $fullRoot -Recurse -Force
-    Move-Item -LiteralPath (Join-Path $fullRoot 'recovery.img') -Destination (Join-Path $fullRoot 'Images/OrangeFox-popsicle.img')
-    $metadata.Remove('layout')
-    foreach ($record in $metadata.files) {
-        if ($record.path -ceq 'recovery.img') { $record.path = 'Images/OrangeFox-popsicle.img' }
-    }
-    $metadata | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $fullRoot 'metadata.json') -Encoding UTF8 -Force
-    $fullPackage = & $module { param($path) Assert-PackageIntegrity $path } $fullRoot
-    Assert-True ($fullPackage.OrangeFox -ceq (Join-Path $fullRoot 'Images/OrangeFox-popsicle.img')) 'Legacy package image path changed.'
-    Pass 'legacy metadata without layout retains full-package compatibility'
-    $metadata.layout = 'full'
-    $metadata | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $fullRoot 'metadata.json') -Encoding UTF8 -Force
-    & $module { param($path) Assert-PackageIntegrity $path } $fullRoot | Out-Null
-    Pass 'explicit full layout retains full-package compatibility'
+    $image = Join-Path $root 'recovery.img'
+    $stream = [IO.File]::Open($image, [IO.FileMode]::Open, [IO.FileAccess]::Write)
+    try { $stream.WriteByte(0) } finally { $stream.Dispose() }
+    Assert-IntegrityFailure $root '*SHA256/size validation failed: recovery.img*'
+    Pass 'single recovery image tampering is rejected before native tools can run'
+
+    $metadata.files += @{ path = 'DEVICE-TEST.md'; bytes = 0; sha256 = '0' * 64 }
+    # Put the prohibited path first so allowlist rejection precedes the deliberately damaged image.
+    $metadata.files = @($metadata.files[-1]) + @($metadata.files | Select-Object -SkipLast 1)
+    $metadata | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $metadataPath -Encoding UTF8 -Force
+    Assert-IntegrityFailure $root '*Unexpected or duplicate package file: DEVICE-TEST.md*'
+    Pass 'extra documentation in metadata cannot extend the fixed single-image payload'
 } finally {
     $resolved = [IO.Path]::GetFullPath($temporary)
     $tempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd('\') + '\'
     if (-not $resolved.StartsWith($tempRoot, [StringComparison]::OrdinalIgnoreCase) -or
-        (Split-Path $resolved -Leaf) -notlike 'android-dev-minimal-tests-*') { throw 'Unsafe temporary cleanup path.' }
+        (Split-Path $resolved -Leaf) -notlike 'android-dev-package-tests-*') { throw 'Unsafe temporary cleanup path.' }
     Remove-Item -LiteralPath $resolved -Recurse -Force
 }
-Write-Host ("All $script:Passed minimal-package checks passed. No builder or device tool was run.")
+Write-Host ("All $script:Passed package checks passed. No builder or device tool was run.")

@@ -8,7 +8,7 @@ PORT = Path(__file__).resolve().parent
 def load_edits():
     edits = []
     seen = set()
-    for name in ("source-edits.json", "ui-source-edits.json", "modules-source-edits.json", "root-source-edits.json"):
+    for name in ("source-edits.json", "ui-source-edits.json", "modules-source-edits.json", "root-source-edits.json", "display-source-edits.json"):
         entries = json.loads((PORT / name).read_text(encoding="utf-8"))
         if not isinstance(entries, list):
             raise RuntimeError(f"Expected an edit list in {name}")

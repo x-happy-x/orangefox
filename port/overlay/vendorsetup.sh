@@ -5,7 +5,8 @@ if [[ ${FOX_BUILD_DEVICE:-} == popsicle || ${1:-} == popsicle ]]; then
     export FOX_TARGET_DEVICES=popsicle
     export FOX_BUILD_TYPE=Unofficial
     export FOX_VARIANT=testing
-    export OF_MAINTAINER='android-dev experimental port'
+    export OF_MAINTAINER='x-happy-x'
+    export BUILD_USERNAME='x-happy-x'
 
     # Upstream device.mk inherits virtual_ab_ota/compression_with_xor.mk and
     # twrp.flags exposes a dedicated, slot-selected /recovery partition.
@@ -17,7 +18,7 @@ if [[ ${FOX_BUILD_DEVICE:-} == popsicle || ${1:-} == popsicle ]]; then
     # Measured primary panel: 1200x2608, corner radius 170 px. Normalize the
     # 1080-wide theme's axes and keep status content inside both rounded edges.
     export OF_SCREEN_H=2347
-    export OF_STATUS_H=72
+    export OF_STATUS_H=108
     export OF_STATUS_INDENT_LEFT=112
     export OF_STATUS_INDENT_RIGHT=92
     # The centered camera cutout occupies the status bar: offer Left/Right only.
