@@ -57,7 +57,9 @@ lunch "$LUNCH_TARGET" || die "Lunch failed; see $log"
    ${OF_KEEP_DM_VERITY_FORCED_ENCRYPTION:-} == 1 &&
    ${FOX_ROOT_ADDONS_DIR:-} == "$root_addons" &&
    ${FOX_LOCAL_CALLBACK_SCRIPT:-} == "$toolkit/port/root-addons/ramdisk-hook.sh" &&
-   ${FOX_ENABLE_KERNELSU_SUPPORT:-} == 1 && ${OF_USE_NANO_EDITOR:-} == 1 ]] || die 'Device build profile was not loaded correctly.'
+   ${FOX_ENABLE_KERNELSU_SUPPORT:-} == 1 && ${OF_USE_NANO_EDITOR:-} == 1 &&
+   ${OF_STATUS_H:-} == 108 && ${OF_MAINTAINER:-} == x-happy-x &&
+   ${BUILD_USERNAME:-} == x-happy-x ]] || die 'Device build profile was not loaded correctly.'
 # The device overlay replaces generic ODM symlinks with real directories.
 # On a second build, Make's initial rsync cannot replace those populated
 # directories. Remove only this generated subtree; the device overlay is
