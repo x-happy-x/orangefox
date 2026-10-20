@@ -4,36 +4,26 @@ param(
     [Parameter(Mandatory = $true)][string]$SourceImage,
     [Parameter(Mandatory = $true)][string]$OutputDir,
     [string]$ToolsDir = 'R:\android\sdk\platform-tools',
-    [string]$RollbackImage = 'D:\Downloads\twrp-3.7.1_16-popsicle-YuKongA-2026-09-12\twrp-3.7.1_16-popsicle-YuKongA-2026-09-12\twrp.img',
     [string]$ReferenceFirmware = 'OS3.0.319.0.WPBCNXM',
     [switch]$RecoveryBootTested,
     [switch]$KernelSUBootTested,
-    [switch]$Minimal,
     [switch]$Zip
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $partitionBytes = [long]104857600
-$rollbackHash = 'e65c58d1bc27a78b8618a03b95c53bcc81a61dd213cad3f4c8639a68806476d4'
 $templateDir = Join-Path (Split-Path $PSScriptRoot -Parent) 'installer/windows'
-$deviceReport = Join-Path (Split-Path $PSScriptRoot -Parent) 'docs/ANDROID-3-device-test.md'
 Import-Module (Join-Path $templateDir 'recovery-installer.psm1') -Force
 $installerModule = Get-Module 'recovery-installer'
 Import-Module (Join-Path $templateDir 'package-layout.psm1') -Force
-$layout = if ($Minimal) { 'minimal' } else { 'full' }
 
 $source = (Get-Item -LiteralPath $SourceImage -Force).FullName
-$rollback = (Get-Item -LiteralPath $RollbackImage -Force).FullName
 $tools = (Get-Item -LiteralPath $ToolsDir -Force).FullName
 $output = [IO.Path]::GetFullPath($OutputDir)
 if (Test-Path -LiteralPath $output) { throw 'OutputDir already exists. Choose a new directory; existing packages are never overwritten.' }
 if ($Zip -and (Test-Path -LiteralPath ($output + '.zip'))) { throw 'The output ZIP already exists.' }
 & $installerModule { param($image) Assert-RecoveryImage $image } $source
-& $installerModule { param($image) Assert-RecoveryImage $image } $rollback
-if ((Get-FileHash -LiteralPath $rollback -Algorithm SHA256).Hash.ToLowerInvariant() -cne $rollbackHash) {
-    throw 'RollbackImage does not match the pinned, previously working TWRP SHA256.'
-}
 $toolFiles = @('adb.exe', 'fastboot.exe', 'AdbWinApi.dll', 'AdbWinUsbApi.dll', 'libwinpthread-1.dll', 'NOTICE.txt', 'source.properties')
 foreach ($name in $toolFiles) {
     $file = Get-Item -LiteralPath (Join-Path $tools $name) -Force
@@ -41,25 +31,21 @@ foreach ($name in $toolFiles) {
 }
 $properties = Get-Content -LiteralPath (Join-Path $tools 'source.properties') -Raw
 if ($properties -notmatch '(?m)^Pkg\.Revision\s*=\s*36\.0\.2\s*$') { throw 'Use the pinned Android platform-tools 36.0.2 distribution.' }
-foreach ($name in @('flash.cmd', 'restore-twrp.cmd', 'install-recovery.ps1', 'recovery-installer.psm1', 'README.txt')) {
+foreach ($name in @('flash.cmd', 'install-recovery.ps1', 'recovery-installer.psm1')) {
     if (-not (Test-Path -LiteralPath (Join-Path $templateDir $name) -PathType Leaf)) { throw "Missing installer template: $name" }
 }
-if (-not (Test-Path -LiteralPath $deviceReport -PathType Leaf)) { throw 'Missing ANDROID-3 device-test report.' }
 
 New-Item -ItemType Directory -Path $output -ErrorAction Stop | Out-Null
-New-Item -ItemType Directory -Path (Join-Path $output 'Images'), (Join-Path $output 'platform-tools') | Out-Null
-foreach ($name in @('flash.cmd', 'restore-twrp.cmd', 'install-recovery.ps1', 'recovery-installer.psm1', 'README.txt')) {
+New-Item -ItemType Directory -Path (Join-Path $output 'platform-tools') | Out-Null
+foreach ($name in @('flash.cmd', 'install-recovery.ps1', 'recovery-installer.psm1')) {
     Copy-Item -LiteralPath (Join-Path $templateDir $name) -Destination (Join-Path $output $name)
 }
-Copy-Item -LiteralPath $deviceReport -Destination (Join-Path $output 'DEVICE-TEST.md')
 foreach ($name in $toolFiles) {
     Copy-Item -LiteralPath (Join-Path $tools $name) -Destination (Join-Path $output 'platform-tools')
 }
-$orangefoxPath = if ($Minimal) { 'recovery.img' } else { 'Images/OrangeFox-popsicle.img' }
-Copy-Item -LiteralPath $source -Destination (Join-Path $output $orangefoxPath)
-Copy-Item -LiteralPath $rollback -Destination (Join-Path $output 'Images/TWRP-popsicle.img')
+Copy-Item -LiteralPath $source -Destination (Join-Path $output 'recovery.img')
 $files = @()
-foreach ($name in (& $installerModule { param($selectedLayout) Get-RequiredPackageFiles $selectedLayout } $layout)) {
+foreach ($name in (& $installerModule { Get-RequiredPackageFiles })) {
     $path = Join-Path $output $name
     $files += [ordered]@{
         path = $name; bytes = (Get-Item -LiteralPath $path -Force).Length
@@ -67,8 +53,7 @@ foreach ($name in (& $installerModule { param($selectedLayout) Get-RequiredPacka
     }
 }
 $metadata = [ordered]@{
-    schema_version = 1
-    layout = $layout
+    schema_version = 2
     created_utc = [DateTime]::UtcNow.ToString('o')
     device = [ordered]@{
         product = 'popsicle'; model = 'Xiaomi 17 Pro Max'; android_version = 16
@@ -79,16 +64,15 @@ $metadata = [ordered]@{
         kernelsu_boot_tested = [bool]$KernelSUBootTested
         magisk_boot_tested = $false
         full_device_validation_complete = $false
-        note = 'Recovery boot, root installation and full device validation are separate checks. See the included DEVICE-TEST.md report.'
+        note = 'Recovery boot and root installation are separate checks; full device validation is incomplete.'
     }
     partition_size_bytes = $partitionBytes
     platform_tools_version = '36.0.2'
-    rollback_sha256 = $rollbackHash
     install_policy = 'Only recovery_<current-slot>; no erase, format, AVB, boot, root or slot switch.'
     files = $files
 }
 $metadata | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $output 'metadata.json') -Encoding UTF8
-if ($Minimal) { Set-MinimalPackageVisibility -PackageRoot $output }
+Set-InstallerPackageVisibility -PackageRoot $output
 & $installerModule { param($root) Assert-PackageIntegrity $root | Out-Null } $output
 $zipPath = $null
 if ($Zip) {
@@ -100,8 +84,7 @@ $payloadBytes = [long]0
 foreach ($entry in $files) { $payloadBytes += [long]$entry['bytes'] }
 [pscustomobject]@{
     PackageDirectory = $output; Zip = $zipPath
-    Layout = $layout
     OrangeFoxSha256 = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToLowerInvariant()
-    RollbackSha256 = $rollbackHash; FirmwareReference = $ReferenceFirmware
+    FirmwareReference = $ReferenceFirmware
     PayloadBytes = $payloadBytes
 }

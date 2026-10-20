@@ -24,7 +24,7 @@ function New-Scenario {
     function script:Assert-PackageIntegrity {
         param([string]$PackageRoot)
         [pscustomobject]@{
-            Root = 'MOCK_PACKAGE'; OrangeFox = 'MOCK_ORANGEFOX.img'; Rollback = 'MOCK_TWRP.img'
+            Root = 'MOCK_PACKAGE'; OrangeFox = 'MOCK_ORANGEFOX.img'
             Metadata = [pscustomobject]@{ device = [pscustomobject]@{ reference_firmware = 'OS3.0.319.0.WPBCNXM'; recovery_boot_tested = $false } }
         }
     }
@@ -78,7 +78,7 @@ function New-Scenario {
 }
 
 function Run-Scenario {
-    param([string]$Name, [hashtable]$Scenario, [bool]$ExpectedSuccess, [switch]$Write, [string]$SelectedSerial = 'TEST123', [string]$Mode = 'OrangeFox')
+    param([string]$Name, [hashtable]$Scenario, [bool]$ExpectedSuccess, [switch]$Write, [string]$SelectedSerial = 'TEST123')
     & $module {
         param($State)
         $script:Scenario = $State
@@ -87,7 +87,7 @@ function Run-Scenario {
     $failed = $false
     $result = $null
     try {
-        $arguments = @{ PackageRoot = 'MOCK_PACKAGE'; Serial = $SelectedSerial; Mode = $Mode; PreflightOnly = -not $Write }
+        $arguments = @{ PackageRoot = 'MOCK_PACKAGE'; Serial = $SelectedSerial; PreflightOnly = -not $Write }
         $result = Invoke-RecoveryInstaller @arguments
     } catch { $failed = $true }
     Assert-True ($failed -ne $ExpectedSuccess) ($Name + ': unexpected outcome')
@@ -141,7 +141,7 @@ $s = New-Scenario; $s.Transport = 'adb'; $s.AdbProduct = 'pandora'
 Run-Scenario 'reject wrong ADB product' $s $false | Out-Null
 Run-Scenario 'write current slot a and reboot after OKAY' (New-Scenario) $true -Write | Out-Null
 $s = New-Scenario; $s.Slot = 'b'
-Run-Scenario 'restore TWRP to current slot b' $s $true -Write -Mode RestoreTwrp | Out-Null
+Run-Scenario 'write current slot b without switching slots' $s $true -Write | Out-Null
 $s = New-Scenario; $s.Transport = 'adb'
 Run-Scenario 'authorized unrooted ADB to bootloader then recovery write' $s $true -Write | Out-Null
 $s = New-Scenario; $s.ChangeSlot = $true
@@ -171,7 +171,7 @@ try {
         $records += @{ path = $name; bytes = (Get-Item -LiteralPath $path).Length; sha256 = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() }
     }
     $metadata = @{
-        schema_version = 1; device = @{ product = 'popsicle' }; partition_size_bytes = 104857600
+        schema_version = 2; device = @{ product = 'popsicle' }; partition_size_bytes = 104857600
         platform_tools_version = '36.0.2'; files = $records
     }
     $metadata | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $temporary 'metadata.json') -Encoding UTF8
@@ -283,9 +283,7 @@ foreach ($enabled in @($false, $true)) {
         $RecoveryBootTested = [System.Management.Automation.SwitchParameter]::new($true)
         $ReferenceFirmware = 'offline-fixture'
         $partitionBytes = [long]104857600
-        $rollbackHash = 'offline-fixture'
         $files = @()
-        $layout = 'full'
         & $MetadataOnly
     } $metadataOnly $enabled
     $device = $result['device']

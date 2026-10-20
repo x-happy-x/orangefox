@@ -2,13 +2,9 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $script:PartitionBytes = [long]104857600
-$script:RollbackSha256 = 'e65c58d1bc27a78b8618a03b95c53bcc81a61dd213cad3f4c8639a68806476d4'
 
-function Get-RequiredPackageFiles([string]$Layout = 'full') {
-    if ($Layout -cnotin @('full', 'minimal')) { throw 'Unsupported package layout.' }
-    $image = if ($Layout -ceq 'minimal') { 'recovery.img' } else { 'Images/OrangeFox-popsicle.img' }
-    @('flash.cmd', 'restore-twrp.cmd', 'install-recovery.ps1', 'recovery-installer.psm1', 'README.txt', 'DEVICE-TEST.md',
-      $image, 'Images/TWRP-popsicle.img',
+function Get-RequiredPackageFiles {
+    @('flash.cmd', 'install-recovery.ps1', 'recovery-installer.psm1', 'recovery.img',
       'platform-tools/adb.exe', 'platform-tools/fastboot.exe',
       'platform-tools/AdbWinApi.dll', 'platform-tools/AdbWinUsbApi.dll',
       'platform-tools/libwinpthread-1.dll', 'platform-tools/NOTICE.txt',
@@ -38,16 +34,12 @@ function Assert-RecoveryImage([string]$Path) {
 function Assert-PackageIntegrity([string]$PackageRoot) {
     $root = (Get-Item -LiteralPath $PackageRoot -Force).FullName
     $metadata = Get-Content -LiteralPath (Join-Path $root 'metadata.json') -Raw | ConvertFrom-Json
-    if ($metadata.schema_version -ne 1 -or $metadata.device.product -cne 'popsicle' -or
+    if ($metadata.schema_version -ne 2 -or $metadata.device.product -cne 'popsicle' -or
         [long]$metadata.partition_size_bytes -ne $script:PartitionBytes -or
         $metadata.platform_tools_version -cne '36.0.2') {
         throw 'Unsupported package metadata, device, platform-tools version or partition size.'
     }
-    # Old packages omit layout and retain the original fixed image path.
-    $layoutProperty = $metadata.PSObject.Properties['layout']
-    $layout = if ($null -eq $layoutProperty) { 'full' } else { $layoutProperty.Value }
-    if ($layout -isnot [string] -or $layout -cnotin @('full', 'minimal')) { throw 'Unsupported package layout.' }
-    $expected = @(Get-RequiredPackageFiles $layout)
+    $expected = @(Get-RequiredPackageFiles)
     $seen = @{}
     foreach ($entry in @($metadata.files)) {
         $name = [string]$entry.path
@@ -64,18 +56,13 @@ function Assert-PackageIntegrity([string]$PackageRoot) {
         }
     }
     if ($seen.Count -ne $expected.Count) { throw 'The package file list is incomplete.' }
-    $orangefox = Join-Path $root $(if ($layout -ceq 'minimal') { 'recovery.img' } else { 'Images/OrangeFox-popsicle.img' })
-    $rollback = Join-Path $root 'Images/TWRP-popsicle.img'
+    $orangefox = Join-Path $root 'recovery.img'
     Assert-RecoveryImage $orangefox
-    Assert-RecoveryImage $rollback
-    if ((Get-FileSha256 $rollback) -cne $script:RollbackSha256) {
-        throw 'The rollback is not the pinned, previously working TWRP image.'
-    }
     $properties = Get-Content -LiteralPath (Join-Path $root 'platform-tools/source.properties') -Raw
     if ($properties -notmatch '(?m)^Pkg\.Revision\s*=\s*36\.0\.2\s*$') {
         throw 'Bundled platform-tools source.properties does not declare 36.0.2.'
     }
-    [pscustomobject]@{ Root = $root; Metadata = $metadata; OrangeFox = $orangefox; Rollback = $rollback }
+    [pscustomobject]@{ Root = $root; Metadata = $metadata; OrangeFox = $orangefox }
 }
 
 function ConvertTo-NativeArgument([string]$Value) {
@@ -259,23 +246,15 @@ function Invoke-RecoveryInstaller {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)][string]$PackageRoot,
-        [Parameter(Mandatory = $true)][ValidateSet('OrangeFox', 'RestoreTwrp')][string]$Mode,
         [string]$Serial,
         [switch]$PreflightOnly
     )
     if ($Serial) { Assert-Serial $Serial }
     $package = Assert-PackageIntegrity $PackageRoot
-    $image = if ($Mode -eq 'OrangeFox') { $package.OrangeFox } else { $package.Rollback }
-    Write-Host ('Action: ' + $Mode + '; device: Xiaomi 17 Pro Max (popsicle); target: current recovery slot.')
+    $image = $package.OrangeFox
+    Write-Host 'Install OrangeFox; device: Xiaomi 17 Pro Max (popsicle); target: current recovery slot.'
     Write-Host ('Reference firmware: ' + $package.Metadata.device.reference_firmware)
-    if ($Mode -eq 'OrangeFox' -and -not $package.Metadata.device.recovery_boot_tested) { Write-Host 'Recovery boot has not yet been verified for this packaged build.' }
-    if ($Mode -eq 'OrangeFox') {
-        $rootTestedProperty = $package.Metadata.device.PSObject.Properties['root_installation_tested']
-        $rootTested = $null -ne $rootTestedProperty -and $rootTestedProperty.Value -is [bool] -and $rootTestedProperty.Value
-        if ($rootTested) { Write-Host 'Root installation is marked tested; see DEVICE-TEST.md for the provider and verified checks.' }
-        else { Write-Host 'Root installation is not marked tested; see DEVICE-TEST.md for checks and limitations.' }
-        Write-Host 'Full device validation is not marked complete.'
-    }
+    if (-not $package.Metadata.device.recovery_boot_tested) { Write-Host 'Recovery boot has not yet been verified for this packaged build.' }
     $device = Get-SingleConnectedDevice $package.Root $Serial
     $serialNumber = $device.Serial
     $backup = $null
@@ -294,7 +273,7 @@ function Invoke-RecoveryInstaller {
             $backupRoot = Join-Path $package.Root ('backups/' + [DateTime]::UtcNow.ToString('yyyyMMddTHHmmssfffZ') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8))
             $backup = Save-RecoveryBackup $package.Root $serialNumber $adbSlot $backupRoot
             Write-Host ('Binary recovery backup: ' + $backup)
-        } else { Write-Host 'ADB is not root; the package includes the pinned working TWRP rollback.' }
+        } else { Write-Host 'ADB is not root; no recovery backup was made.' }
         Get-CheckedToolResult $package.Root 'adb' @('-s', $serialNumber, 'reboot', 'bootloader') | Out-Null
         $deadline = [DateTime]::UtcNow.AddSeconds(90)
         do {
@@ -326,7 +305,7 @@ function Invoke-RecoveryInstaller {
     Assert-SuccessfulFlash $result $preflight.Target
     Write-Host ("Flash verified: $($preflight.Target); serial: $serialNumber")
     Get-CheckedToolResult $package.Root 'fastboot' @('-s', $serialNumber, 'reboot', 'recovery') | Out-Null
-    [pscustomobject]@{ Result = 'Flash verified; recovery reboot requested'; Serial = $serialNumber; Partition = $preflight.Target; Backup = $backup; Mode = $Mode }
+    [pscustomobject]@{ Result = 'Flash verified; recovery reboot requested'; Serial = $serialNumber; Partition = $preflight.Target; Backup = $backup }
 }
 
 Export-ModuleMember -Function Invoke-RecoveryInstaller
